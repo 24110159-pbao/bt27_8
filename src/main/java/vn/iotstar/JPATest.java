@@ -1,10 +1,11 @@
 package vn.iotstar;
 
+import java.util.List;
+
 import jakarta.persistence.EntityManager;
+
 import vn.iotstar.config.JPAConfig;
 import vn.iotstar.entity.Category;
-
-import java.util.List;
 
 public class JPATest {
 
@@ -14,20 +15,20 @@ public class JPATest {
 
         try {
 
-            String jpql = "SELECT c FROM Category c";
-
             List<Category> categories =
-                    em.createQuery(jpql, Category.class)
-                            .getResultList();
+                    em.createQuery(
+                            "SELECT c FROM Category c ORDER BY c.cateId",
+                            Category.class
+                    ).getResultList();
 
             for (Category category : categories) {
 
                 System.out.println(
-                        category.getCategoryid()
+                        category.getCateId()
                                 + " - "
-                                + category.getCategoryname()
+                                + category.getCateName()
                                 + " - "
-                                + category.getImages()
+                                + category.getIcons()
                 );
             }
 

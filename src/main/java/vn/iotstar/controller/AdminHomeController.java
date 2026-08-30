@@ -19,7 +19,7 @@ public class AdminHomeController extends HttpServlet {
 
         resp.sendRedirect(
                 req.getContextPath()
-                        + "/admin/category/list"
+                        + "/admin/categories"
         );
     }
 }

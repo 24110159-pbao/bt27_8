@@ -1,6 +1,5 @@
 <%
     response.sendRedirect(
-            request.getContextPath()
-                    + "/admin/category/list"
+        request.getContextPath() + "/login"
     );
 %>

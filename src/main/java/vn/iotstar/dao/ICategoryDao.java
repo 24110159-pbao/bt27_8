@@ -1,8 +1,8 @@
 package vn.iotstar.dao;
 
-import vn.iotstar.entity.Category;
-
 import java.util.List;
+
+import vn.iotstar.entity.Category;
 
 public interface ICategoryDao {
 
@@ -10,17 +10,17 @@ public interface ICategoryDao {
 
     void update(Category category);
 
-    void delete(int categoryid) throws Exception;
+    void delete(int cateId) throws Exception;
 
-    Category findById(int categoryid);
+    Category findById(int cateId);
 
-    Category findByCategoryname(String categoryname);
+    Category findByCateName(String cateName);
 
     List<Category> findAll();
 
-    List<Category> searchByName(String categoryname);
+    List<Category> findAll(int page, int pageSize);
 
-    List<Category> findAll(int page, int pagesize);
+    List<Category> searchByName(String cateName);
 
     int count();
 }

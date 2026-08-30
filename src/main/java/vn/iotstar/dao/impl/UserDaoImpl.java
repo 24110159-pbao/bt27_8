@@ -1,150 +1,313 @@
 package vn.iotstar.dao.impl;
 
-import vn.iotstar.connection.DBConnection;
+import java.util.List;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.TypedQuery;
+
+import vn.iotstar.config.JPAConfig;
 import vn.iotstar.dao.UserDao;
 import vn.iotstar.entity.User;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 
 public class UserDaoImpl implements UserDao {
 
     @Override
-    public User get(String username) {
-
-        String sql = "SELECT * FROM users WHERE username = ?";
-
-        try (
-                Connection conn = new DBConnection().getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
-
-            ps.setString(1, username);
-
-            try (ResultSet rs = ps.executeQuery()) {
-
-                if (rs.next()) {
-
-                    User user = new User();
-
-                    user.setId(rs.getInt("id"));
-                    user.setEmail(rs.getString("email"));
-                    user.setUserName(rs.getString("username"));
-                    user.setFullName(rs.getString("fullname"));
-                    user.setPassWord(rs.getString("password"));
-                    user.setAvatar(rs.getString("avatar"));
-                    user.setRoleid(rs.getInt("roleid"));
-                    user.setPhone(rs.getString("phone"));
-                    user.setCreatedDate(rs.getDate("createddate"));
-
-                    return user;
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    @Override
     public void insert(User user) {
 
-        String sql = """
-                INSERT INTO users
-                (email, username, fullname, password, avatar, roleid, phone, createddate)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                """;
+        EntityManager em = JPAConfig.getEntityManager();
+        EntityTransaction transaction = em.getTransaction();
 
-        try (
-                Connection conn = new DBConnection().getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
+        try {
+            transaction.begin();
 
-            ps.setString(1, user.getEmail());
-            ps.setString(2, user.getUserName());
-            ps.setString(3, user.getFullName());
-            ps.setString(4, user.getPassWord());
-            ps.setString(5, user.getAvatar());
-            ps.setInt(6, user.getRoleid());
-            ps.setString(7, user.getPhone());
-            ps.setDate(8, user.getCreatedDate());
+            em.persist(user);
 
-            ps.executeUpdate();
+            transaction.commit();
 
         } catch (Exception e) {
-            e.printStackTrace();
+
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+
+            throw e;
+
+        } finally {
+            em.close();
         }
     }
 
     @Override
-    public boolean checkExistEmail(String email) {
+    public void update(User user) {
 
-        String sql = "SELECT 1 FROM users WHERE email = ?";
+        EntityManager em = JPAConfig.getEntityManager();
+        EntityTransaction transaction = em.getTransaction();
 
-        try (
-                Connection conn = new DBConnection().getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
+        try {
+            transaction.begin();
 
-            ps.setString(1, email);
+            em.merge(user);
 
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next();
-            }
+            transaction.commit();
 
         } catch (Exception e) {
-            e.printStackTrace();
-        }
 
-        return false;
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+
+            throw e;
+
+        } finally {
+            em.close();
+        }
     }
 
     @Override
-    public boolean checkExistUsername(String username) {
+    public void delete(int id) throws Exception {
 
-        String sql = "SELECT 1 FROM users WHERE username = ?";
+        EntityManager em = JPAConfig.getEntityManager();
+        EntityTransaction transaction = em.getTransaction();
 
-        try (
-                Connection conn = new DBConnection().getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
+        try {
+            transaction.begin();
 
-            ps.setString(1, username);
+            User user = em.find(User.class, id);
 
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next();
+            if (user == null) {
+                throw new Exception("Không tìm thấy User");
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            em.remove(user);
 
-        return false;
+            transaction.commit();
+
+        } catch (Exception e) {
+
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+
+            throw e;
+
+        } finally {
+            em.close();
+        }
     }
 
     @Override
-    public boolean checkExistPhone(String phone) {
+    public User findById(int id) {
 
-        String sql = "SELECT 1 FROM users WHERE phone = ?";
+        EntityManager em = JPAConfig.getEntityManager();
 
-        try (
-                Connection conn = new DBConnection().getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
+        try {
+            return em.find(User.class, id);
 
-            ps.setString(1, phone);
+        } finally {
+            em.close();
+        }
+    }
 
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next();
+    @Override
+    public User findByUsername(String username) {
+
+        EntityManager em = JPAConfig.getEntityManager();
+
+        try {
+
+            String jpql =
+                    "SELECT u FROM User u " +
+                            "WHERE u.username = :username";
+
+            TypedQuery<User> query =
+                    em.createQuery(jpql, User.class);
+
+            query.setParameter("username", username);
+
+            try {
+                return query.getSingleResult();
+            } catch (NoResultException e) {
+                return null;
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } finally {
+            em.close();
         }
-
-        return false;
     }
+
+    @Override
+    public User findByEmail(String email) {
+
+        EntityManager em = JPAConfig.getEntityManager();
+
+        try {
+
+            String jpql =
+                    "SELECT u FROM User u " +
+                            "WHERE u.email = :email";
+
+            TypedQuery<User> query =
+                    em.createQuery(jpql, User.class);
+
+            query.setParameter("email", email);
+
+            try {
+                return query.getSingleResult();
+            } catch (NoResultException e) {
+                return null;
+            }
+
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public User login(String username, String password) {
+
+        EntityManager em = JPAConfig.getEntityManager();
+
+        try {
+
+            String jpql =
+                    "SELECT u FROM User u " +
+                            "WHERE u.username = :username " +
+                            "AND u.password = :password";
+
+            TypedQuery<User> query =
+                    em.createQuery(jpql, User.class);
+
+            query.setParameter("username", username);
+            query.setParameter("password", password);
+
+            try {
+                return query.getSingleResult();
+            } catch (NoResultException e) {
+                return null;
+            }
+
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<User> findAll() {
+
+        EntityManager em = JPAConfig.getEntityManager();
+
+        try {
+
+            String jpql =
+                    "SELECT u FROM User u ORDER BY u.id ASC";
+
+            TypedQuery<User> query =
+                    em.createQuery(jpql, User.class);
+
+            return query.getResultList();
+
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<User> findAll(int page, int pageSize) {
+
+        EntityManager em = JPAConfig.getEntityManager();
+
+        try {
+
+            String jpql =
+                    "SELECT u FROM User u ORDER BY u.id ASC";
+
+            TypedQuery<User> query =
+                    em.createQuery(jpql, User.class);
+
+            query.setFirstResult(page * pageSize);
+            query.setMaxResults(pageSize);
+
+            return query.getResultList();
+
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<User> searchByName(String fullname) {
+
+        EntityManager em = JPAConfig.getEntityManager();
+
+        try {
+
+            String jpql =
+                    "SELECT u FROM User u " +
+                            "WHERE u.fullname LIKE :fullname " +
+                            "ORDER BY u.id ASC";
+
+            TypedQuery<User> query =
+                    em.createQuery(jpql, User.class);
+
+            query.setParameter(
+                    "fullname",
+                    "%" + fullname + "%"
+            );
+
+            return query.getResultList();
+
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public int count() {
+
+        EntityManager em = JPAConfig.getEntityManager();
+
+        try {
+
+            String jpql =
+                    "SELECT COUNT(u) FROM User u";
+
+            Long count =
+                    em.createQuery(jpql, Long.class)
+                            .getSingleResult();
+
+            return count.intValue();
+
+        } finally {
+            em.close();
+        }
+    }
+    @Override
+    public User findByPhone(String phone) {
+
+        EntityManager em = JPAConfig.getEntityManager();
+
+        try {
+
+            String jpql =
+                    "SELECT u FROM User u " +
+                            "WHERE u.phone = :phone";
+
+            TypedQuery<User> query =
+                    em.createQuery(jpql, User.class);
+
+            query.setParameter("phone", phone);
+
+            try {
+                return query.getSingleResult();
+            } catch (NoResultException e) {
+                return null;
+            }
+
+        } finally {
+            em.close();
+        }
+    }
+
 }

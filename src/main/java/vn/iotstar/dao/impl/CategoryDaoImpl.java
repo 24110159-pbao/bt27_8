@@ -1,5 +1,7 @@
 package vn.iotstar.dao.impl;
 
+import java.util.List;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.NoResultException;
@@ -8,8 +10,6 @@ import jakarta.persistence.TypedQuery;
 import vn.iotstar.config.JPAConfig;
 import vn.iotstar.dao.ICategoryDao;
 import vn.iotstar.entity.Category;
-
-import java.util.List;
 
 public class CategoryDaoImpl implements ICategoryDao {
 
@@ -20,7 +20,6 @@ public class CategoryDaoImpl implements ICategoryDao {
         EntityTransaction transaction = em.getTransaction();
 
         try {
-
             transaction.begin();
 
             em.persist(category);
@@ -36,11 +35,9 @@ public class CategoryDaoImpl implements ICategoryDao {
             throw e;
 
         } finally {
-
             em.close();
         }
     }
-
 
     @Override
     public void update(Category category) {
@@ -49,7 +46,6 @@ public class CategoryDaoImpl implements ICategoryDao {
         EntityTransaction transaction = em.getTransaction();
 
         try {
-
             transaction.begin();
 
             em.merge(category);
@@ -65,24 +61,20 @@ public class CategoryDaoImpl implements ICategoryDao {
             throw e;
 
         } finally {
-
             em.close();
         }
     }
 
-
     @Override
-    public void delete(int categoryid) throws Exception {
+    public void delete(int cateId) throws Exception {
 
         EntityManager em = JPAConfig.getEntityManager();
         EntityTransaction transaction = em.getTransaction();
 
         try {
-
             transaction.begin();
 
-            Category category =
-                    em.find(Category.class, categoryid);
+            Category category = em.find(Category.class, cateId);
 
             if (category == null) {
                 throw new Exception("Không tìm thấy Category");
@@ -101,30 +93,25 @@ public class CategoryDaoImpl implements ICategoryDao {
             throw e;
 
         } finally {
-
             em.close();
         }
     }
 
-
     @Override
-    public Category findById(int categoryid) {
+    public Category findById(int cateId) {
 
         EntityManager em = JPAConfig.getEntityManager();
 
         try {
-
-            return em.find(Category.class, categoryid);
+            return em.find(Category.class, cateId);
 
         } finally {
-
             em.close();
         }
     }
 
-
     @Override
-    public Category findByCategoryname(String categoryname) {
+    public Category findByCateName(String cateName) {
 
         EntityManager em = JPAConfig.getEntityManager();
 
@@ -132,28 +119,23 @@ public class CategoryDaoImpl implements ICategoryDao {
 
             String jpql =
                     "SELECT c FROM Category c " +
-                            "WHERE c.categoryname = :categoryname";
+                            "WHERE c.cateName = :cateName";
 
             TypedQuery<Category> query =
                     em.createQuery(jpql, Category.class);
 
-            query.setParameter("categoryname", categoryname);
+            query.setParameter("cateName", cateName);
 
             try {
-
                 return query.getSingleResult();
-
             } catch (NoResultException e) {
-
                 return null;
             }
 
         } finally {
-
             em.close();
         }
     }
-
 
     @Override
     public List<Category> findAll() {
@@ -163,7 +145,8 @@ public class CategoryDaoImpl implements ICategoryDao {
         try {
 
             String jpql =
-                    "SELECT c FROM Category c";
+                    "SELECT c FROM Category c " +
+                            "ORDER BY c.cateId ASC";
 
             TypedQuery<Category> query =
                     em.createQuery(jpql, Category.class);
@@ -171,14 +154,12 @@ public class CategoryDaoImpl implements ICategoryDao {
             return query.getResultList();
 
         } finally {
-
             em.close();
         }
     }
 
-
     @Override
-    public List<Category> searchByName(String categoryname) {
+    public List<Category> findAll(int page, int pageSize) {
 
         EntityManager em = JPAConfig.getEntityManager();
 
@@ -186,49 +167,44 @@ public class CategoryDaoImpl implements ICategoryDao {
 
             String jpql =
                     "SELECT c FROM Category c " +
-                            "WHERE c.categoryname LIKE :categoryname";
+                            "ORDER BY c.cateId ASC";
 
             TypedQuery<Category> query =
                     em.createQuery(jpql, Category.class);
 
-            query.setParameter(
-                    "categoryname",
-                    "%" + categoryname + "%"
-            );
+            query.setFirstResult(page * pageSize);
+            query.setMaxResults(pageSize);
 
             return query.getResultList();
 
         } finally {
-
             em.close();
         }
     }
 
-
     @Override
-    public List<Category> findAll(int page, int pagesize) {
+    public List<Category> searchByName(String cateName) {
 
         EntityManager em = JPAConfig.getEntityManager();
 
         try {
 
             String jpql =
-                    "SELECT c FROM Category c";
+                    "SELECT c FROM Category c " +
+                            "WHERE c.cateName LIKE :cateName " +
+                            "ORDER BY c.cateId ASC";
 
             TypedQuery<Category> query =
                     em.createQuery(jpql, Category.class);
 
-            query.setFirstResult(page * pagesize);
-            query.setMaxResults(pagesize);
+            query.setParameter("cateName", "%" + cateName + "%");
 
             return query.getResultList();
 
         } finally {
-
             em.close();
         }
     }
-
 
     @Override
     public int count() {
@@ -247,7 +223,6 @@ public class CategoryDaoImpl implements ICategoryDao {
             return count.intValue();
 
         } finally {
-
             em.close();
         }
     }

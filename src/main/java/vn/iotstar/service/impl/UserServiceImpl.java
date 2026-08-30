@@ -1,30 +1,105 @@
 package vn.iotstar.service.impl;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import vn.iotstar.dao.UserDao;
 import vn.iotstar.dao.impl.UserDaoImpl;
 import vn.iotstar.entity.User;
 import vn.iotstar.service.IUserService;
-
-import java.sql.Date;
 
 public class UserServiceImpl implements IUserService {
 
     private final UserDao userDao = new UserDaoImpl();
 
     @Override
-    public User login(String username, String password) {
+    public void insert(User user) {
 
-        User user = this.get(username);
-
-        if (user != null && password.equals(user.getPassWord())) {
-            return user;
+        if (checkExistUsername(user.getUsername())) {
+            throw new RuntimeException("Tài khoản đã tồn tại");
         }
 
-        return null;
+        if (checkExistEmail(user.getEmail())) {
+            throw new RuntimeException("Email đã tồn tại");
+        }
+
+        if (checkExistPhone(user.getPhone())) {
+            throw new RuntimeException("Số điện thoại đã tồn tại");
+        }
+
+        userDao.insert(user);
     }
 
-    private User get(String username) {
-        return userDao.get(username);
+    @Override
+    public void update(User user) {
+
+        User oldUser = userDao.findById(user.getId());
+
+        if (oldUser == null) {
+            throw new RuntimeException("Không tìm thấy User");
+        }
+
+        userDao.update(user);
+    }
+
+    @Override
+    public void delete(int id) throws Exception {
+        userDao.delete(id);
+    }
+
+    @Override
+    public User findById(int id) {
+        return userDao.findById(id);
+    }
+
+    @Override
+    public User findByUsername(String username) {
+        return userDao.findByUsername(username);
+    }
+
+    @Override
+    public User findByEmail(String email) {
+        return userDao.findByEmail(email);
+    }
+
+    @Override
+    public User login(String username, String password) {
+        return userDao.login(username, password);
+    }
+
+    @Override
+    public List<User> findAll() {
+        return userDao.findAll();
+    }
+
+    @Override
+    public List<User> findAll(int page, int pageSize) {
+        return userDao.findAll(page, pageSize);
+    }
+
+    @Override
+    public List<User> searchByName(String fullname) {
+        return userDao.searchByName(fullname);
+    }
+
+    @Override
+    public int count() {
+        return userDao.count();
+    }
+
+    @Override
+    public boolean checkExistEmail(String email) {
+        return userDao.findByEmail(email) != null;
+    }
+
+    @Override
+    public boolean checkExistUsername(String username) {
+        return userDao.findByUsername(username) != null;
+    }
+
+    @Override
+    public boolean checkExistPhone(String phone) {
+        return userDao.findByPhone(phone) != null;
     }
 
     @Override
@@ -35,54 +110,29 @@ public class UserServiceImpl implements IUserService {
             String fullname,
             String phone) {
 
-        if (userDao.checkExistUsername(username)) {
+        try {
+
+            User user = new User();
+
+            user.setEmail(email);
+            user.setPassword(password);
+            user.setUsername(username);
+            user.setFullname(fullname);
+            user.setPhone(phone);
+
+            user.setAvatar(null);
+            user.setRoleid(2);
+            user.setCreateddate(LocalDate.now());
+
+            userDao.insert(user);
+
+            return true;
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
             return false;
         }
-
-        if (userDao.checkExistEmail(email)) {
-            return false;
-        }
-
-        if (userDao.checkExistPhone(phone)) {
-            return false;
-        }
-
-        long millis = System.currentTimeMillis();
-        Date date = new Date(millis);
-
-        User user = new User(
-                email,
-                username,
-                fullname,
-                password,
-                null,
-                2,
-                phone,
-                date
-        );
-
-        userDao.insert(user);
-
-        return true;
-    }
-
-    @Override
-    public boolean checkExistEmail(String email) {
-        return userDao.checkExistEmail(email);
-    }
-
-    @Override
-    public boolean checkExistUsername(String username) {
-        return userDao.checkExistUsername(username);
-    }
-
-    @Override
-    public boolean checkExistPhone(String phone) {
-        return userDao.checkExistPhone(phone);
-    }
-
-    @Override
-    public void insert(User user) {
-        userDao.insert(user);
     }
 }

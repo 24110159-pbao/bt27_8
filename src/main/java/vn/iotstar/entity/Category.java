@@ -1,25 +1,24 @@
 package vn.iotstar.entity;
 
-import jakarta.persistence.Column;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.persistence.Column;
+import lombok.Getter;
+import lombok.Setter;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.io.Serial;
-import java.io.Serializable;
-
+@Setter
+@Getter
 @Entity
 @Table(name = "Category")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Category implements Serializable {
 
     @Serial
@@ -28,12 +27,35 @@ public class Category implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cate_id")
-    private int categoryid;
+    private int cateId;
 
-    @NotEmpty(message = "Tên danh mục không được để trống")
     @Column(name = "cate_name", nullable = false, length = 255)
-    private String categoryname;
+    private String cateName;
 
     @Column(name = "icons", length = 255)
-    private String images;
+    private String icons;
+
+    @OneToMany(mappedBy = "category")
+    private List<Video> videos = new ArrayList<>();
+
+    public Category() {
+    }
+
+    public Category(String cateName, String icons) {
+        this.cateName = cateName;
+        this.icons = icons;
+    }
+
+    public Video addVideo(Video video) {
+        getVideos().add(video);
+        video.setCategory(this);
+        return video;
+    }
+
+    public Video removeVideo(Video video) {
+        getVideos().remove(video);
+        video.setCategory(null);
+        return video;
+    }
+
 }

@@ -1,16 +1,32 @@
 package vn.iotstar.dao;
 
+import java.util.List;
+
 import vn.iotstar.entity.User;
 
 public interface UserDao {
 
-    User get(String username);
-
     void insert(User user);
 
-    boolean checkExistEmail(String email);
+    void update(User user);
 
-    boolean checkExistUsername(String username);
+    void delete(int id) throws Exception;
 
-    boolean checkExistPhone(String phone);
+    User findById(int id);
+
+    User findByUsername(String username);
+
+    User findByEmail(String email);
+
+    User findByPhone(String phone);
+
+    User login(String username, String password);
+
+    List<User> findAll();
+
+    List<User> findAll(int page, int pageSize);
+
+    List<User> searchByName(String fullname);
+
+    int count();
 }
