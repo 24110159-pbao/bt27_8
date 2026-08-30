@@ -1,174 +1,317 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+<%@ page import="vn.iotstar.entity.Category" %>
+
+<%
+    Category category =
+            (Category) request.getAttribute("category");
+%>
+
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sửa danh mục</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: #f8f9fa;
-            color: #333;
-            line-height: 1.5;
-        }
-        .container {
-            width: 95%;
-            max-width: 600px;
-            margin: 50px auto;
-        }
-        .form-box {
-            background: white;
-            padding: 35px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-        h1 {
-            font-size: 24px;
-            color: #1a1a1a;
-            margin-bottom: 25px;
-            font-weight: 600;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #4b5563;
-            font-size: 14px;
-        }
-        input[type="text"] {
-            width: 100%;
-            padding: 10px 14px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 15px;
-            color: #1f2937;
-            transition: all 0.2s ease;
-        }
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #f59e0b;
-            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
-        }
-        .preview {
-            margin-top: 12px;
-        }
-        .preview img {
-            width: 160px;
-            height: 110px;
-            object-fit: cover;
-            border-radius: 6px;
-            border: 1px solid #e5e7eb;
-        }
-        .error {
-            background: #fee2e2;
-            border-left: 4px solid #ef4444;
-            color: #991b1b;
-            padding: 12px 16px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-        .buttons {
-            display: flex;
-            gap: 12px;
-            margin-top: 30px;
-        }
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            text-decoration: none;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-        .btn-save {
-            background: #f59e0b;
-            color: white;
-            flex: 1;
-        }
-        .btn-save:hover {
-            background: #d97706;
-        }
-        .btn-back {
-            background: #4b5563;
-            color: white;
-        }
-        .btn-back:hover {
-            background: #374151;
-        }
-    </style>
+
+    <title>Chỉnh sửa danh mục</title>
+
+    <link rel="stylesheet"
+          href="${pageContext.request.contextPath}/css/style.css">
+
 </head>
+
 <body>
-    <div class="container">
-        <div class="form-box">
-            <h1>Sửa danh mục</h1>
 
-            <c:if test="${not empty error}">
-                <div class="error">
-                    ${error}
-                </div>
-            </c:if>
+<div class="admin-layout">
 
-            <form action="${pageContext.request.contextPath}/admin/category/update" method="post">
-                <input type="hidden" name="cateId" value="${category.cateId}">
+    <aside class="sidebar">
 
-                <div class="form-group">
-                    <label for="cateName">Tên danh mục</label>
-                    <input 
-                        type="text" 
-                        id="cateName" 
-                        name="cateName" 
-                        value="${category.cateName}" 
-                        required>
-                </div>
-
-                <div class="form-group">
-                    <label for="icons">Đường dẫn hình ảnh</label>
-                    <input 
-                        type="text" 
-                        id="icons" 
-                        name="icons" 
-                        value="${category.icons}">
-
-                    <c:if test="${not empty category.icons}">
-                        <div class="preview">
-                            <c:choose>
-                                <c:when test="${category.icons.startsWith('http')}">
-                                    <img src="${category.icons}" alt="${category.cateName}">
-                                </c:when>
-                                <c:otherwise>
-                                    <img src="${pageContext.request.contextPath}/image?fname=${category.icons}" alt="${category.cateName}">
-                                </c:otherwise>
-                            </c:choose>
-                        </div>
-                    </c:if>
-                </div>
-
-                <div class="buttons">
-                    <button type="submit" class="btn btn-save">
-                        Cập nhật
-                    </button>
-                    <a href="${pageContext.request.contextPath}/admin/categories" class="btn btn-back">
-                        Quay lại
-                    </a>
-                </div>
-            </form>
+        <div class="sidebar-logo">
+            🛒 <span>Shopping MVC</span>
         </div>
-    </div>
+
+        <div class="sidebar-menu">
+
+            <div class="menu-title">
+                QUẢN LÝ
+            </div>
+
+            <a href="${pageContext.request.contextPath}/admin/home"
+               class="menu-item">
+
+                📊
+                <span>Trang chủ</span>
+
+            </a>
+
+            <a href="${pageContext.request.contextPath}/admin/categories"
+               class="menu-item active">
+
+                📁
+                <span>Danh mục</span>
+
+            </a>
+
+            <a href="${pageContext.request.contextPath}/admin/videos"
+               class="menu-item">
+
+                🎬
+                <span>Video</span>
+
+            </a>
+
+            <div class="menu-title">
+                HỆ THỐNG
+            </div>
+
+            <a href="${pageContext.request.contextPath}/logout"
+               class="menu-item">
+
+                🚪
+                <span>Đăng xuất</span>
+
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <main class="main-area">
+
+        <header class="topbar">
+
+            <div class="topbar-title">
+                Chỉnh sửa danh mục
+            </div>
+
+        </header>
+
+
+        <section class="content">
+
+            <div class="page-title">
+
+                <div>
+
+                    <h1>
+                        Chỉnh sửa danh mục
+                    </h1>
+
+                    <p>
+                        Cập nhật thông tin danh mục
+                    </p>
+
+                </div>
+
+                <a href="${pageContext.request.contextPath}/admin/categories"
+                   class="btn btn-secondary">
+
+                    ← Quay lại
+
+                </a>
+
+            </div>
+
+
+            <% if (request.getAttribute("error") != null) { %>
+
+            <div class="alert alert-danger">
+
+                <%= request.getAttribute("error") %>
+
+            </div>
+
+            <% } %>
+
+
+            <div class="card form-card">
+
+                <div class="card-header">
+
+                    <div>
+
+                        <h3>
+                            Thông tin danh mục
+                        </h3>
+
+                        <span>
+                            Cập nhật thông tin bên dưới
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="card-body">
+
+
+                    <form method="post"
+                          action="${pageContext.request.contextPath}/admin/category/update"
+                          enctype="multipart/form-data">
+
+
+                        <!-- ID -->
+
+                        <div class="form-group">
+
+                            <label>
+                                ID
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   value="<%= category.getCateId() %>"
+                                   disabled>
+
+                            <input type="hidden"
+                                   name="cateId"
+                                   value="<%= category.getCateId() %>">
+
+                        </div>
+
+
+                        <!-- NAME -->
+
+                        <div class="form-group">
+
+                            <label>
+                                Tên danh mục
+                            </label>
+
+                            <input type="text"
+                                   name="cateName"
+                                   class="form-control"
+                                   value="<%= category.getCateName() %>"
+                                   required>
+
+                        </div>
+
+
+                        <!-- OLD IMAGE -->
+
+                        <div class="form-group">
+
+                            <label>
+                                Icon hiện tại
+                            </label>
+
+                            <div>
+
+                                <% if (category.getIcons() != null
+                                        && !category.getIcons().isEmpty()) { %>
+
+                                <img
+                                    src="${pageContext.request.contextPath}/image?fname=<%= category.getIcons() %>"
+                                    class="preview-image"
+                                    alt="Icon hiện tại">
+
+                                <% } else { %>
+
+                                <div class="no-image">
+                                    📁 Chưa có icon
+                                </div>
+
+                                <% } %>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- NEW IMAGE -->
+
+                        <div class="form-group">
+
+                            <label>
+                                Chọn icon mới
+                            </label>
+
+                            <input type="file"
+                                   name="icon"
+                                   class="form-control file-input"
+                                   accept="image/*"
+                                   onchange="previewImage(event)">
+
+                            <img
+                                id="preview"
+                                class="preview-image"
+                                style="display:none;">
+
+                            <small class="form-hint">
+
+                                Nếu không chọn ảnh mới,
+                                icon hiện tại sẽ được giữ nguyên.
+
+                            </small>
+
+                        </div>
+
+
+                        <!-- BUTTON -->
+
+                        <div class="form-actions">
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+
+                                💾 Lưu thay đổi
+
+                            </button>
+
+                            <a href="${pageContext.request.contextPath}/admin/categories"
+                               class="btn btn-secondary">
+
+                                Hủy
+
+                            </a>
+
+                        </div>
+
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script>
+
+function previewImage(event) {
+
+    const file =
+        event.target.files[0];
+
+    const preview =
+        document.getElementById("preview");
+
+
+    if (file) {
+
+        preview.src =
+            URL.createObjectURL(file);
+
+        preview.style.display =
+            "block";
+
+    } else {
+
+        preview.style.display =
+            "none";
+    }
+}
+
+</script>
+
 </body>
+
 </html>

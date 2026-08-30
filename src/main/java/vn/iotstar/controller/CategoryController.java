@@ -1,17 +1,22 @@
 package vn.iotstar.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serial;
+import java.nio.file.Paths;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
 
 import vn.iotstar.entity.Category;
 import vn.iotstar.service.ICategoryService;
 import vn.iotstar.service.impl.CategoryServiceImpl;
+import vn.iotstar.util.Constant;
 
 @WebServlet({
         "/admin/categories",
@@ -21,6 +26,11 @@ import vn.iotstar.service.impl.CategoryServiceImpl;
         "/admin/category/update",
         "/admin/category/delete"
 })
+@MultipartConfig(
+        fileSizeThreshold = 1024 * 1024,
+        maxFileSize = 5 * 1024 * 1024,
+        maxRequestSize = 10 * 1024 * 1024
+)
 public class CategoryController extends HttpServlet {
 
     @Serial
@@ -28,6 +38,7 @@ public class CategoryController extends HttpServlet {
 
     private final ICategoryService categoryService =
             new CategoryServiceImpl();
+
 
     @Override
     protected void doGet(
@@ -37,7 +48,11 @@ public class CategoryController extends HttpServlet {
 
         String url = req.getRequestURI();
 
-        // Danh sách Category
+
+        // =========================
+        // DANH SÁCH CATEGORY
+        // =========================
+
         if (url.contains("/admin/categories")) {
 
             req.setAttribute(
@@ -51,7 +66,11 @@ public class CategoryController extends HttpServlet {
 
         }
 
-        // Trang thêm Category
+
+        // =========================
+        // TRANG THÊM CATEGORY
+        // =========================
+
         else if (url.contains("/admin/category/add")) {
 
             req.getRequestDispatcher(
@@ -60,33 +79,63 @@ public class CategoryController extends HttpServlet {
 
         }
 
-        // Trang sửa Category
+
+        // =========================
+        // TRANG SỬA CATEGORY
+        // =========================
+
         else if (url.contains("/admin/category/edit")) {
 
-            String id = req.getParameter("id");
+            String id =
+                    req.getParameter("id");
 
             if (id == null || id.isEmpty()) {
+
                 resp.sendRedirect(
                         req.getContextPath()
                                 + "/admin/categories"
                 );
+
                 return;
             }
 
-            int cateId = Integer.parseInt(id);
+            int cateId;
+
+            try {
+
+                cateId = Integer.parseInt(id);
+
+            } catch (NumberFormatException e) {
+
+                resp.sendRedirect(
+                        req.getContextPath()
+                                + "/admin/categories"
+                );
+
+                return;
+            }
+
 
             Category category =
                     categoryService.findById(cateId);
 
+
             if (category == null) {
+
                 resp.sendRedirect(
                         req.getContextPath()
                                 + "/admin/categories"
                 );
+
                 return;
             }
 
-            req.setAttribute("category", category);
+
+            req.setAttribute(
+                    "category",
+                    category
+            );
+
 
             req.getRequestDispatcher(
                     "/views/admin/category-edit.jsp"
@@ -94,25 +143,31 @@ public class CategoryController extends HttpServlet {
 
         }
 
-        // Xóa Category
+
+        // =========================
+        // DELETE
+        // =========================
+
         else if (url.contains("/admin/category/delete")) {
 
-            String id = req.getParameter("id");
+            String id =
+                    req.getParameter("id");
 
             if (id != null && !id.isEmpty()) {
 
-                int cateId = Integer.parseInt(id);
-
                 try {
+
+                    int cateId =
+                            Integer.parseInt(id);
 
                     categoryService.delete(cateId);
 
                 } catch (Exception e) {
 
                     e.printStackTrace();
-
                 }
             }
+
 
             resp.sendRedirect(
                     req.getContextPath()
@@ -120,6 +175,7 @@ public class CategoryController extends HttpServlet {
             );
         }
     }
+
 
     @Override
     protected void doPost(
@@ -130,44 +186,63 @@ public class CategoryController extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setCharacterEncoding("UTF-8");
 
-        String url = req.getRequestURI();
 
-        // Insert Category
+        String url =
+                req.getRequestURI();
+
+
+        // =========================
+        // INSERT
+        // =========================
+
         if (url.contains("/admin/category/insert")) {
 
             String cateName =
                     req.getParameter("cateName");
 
-            String icons =
-                    req.getParameter("icons");
 
-            Category category = new Category();
+            Part iconPart =
+                    req.getPart("icon");
+
+
+            String iconName =
+                    uploadImage(iconPart);
+
+
+            Category category =
+                    new Category();
 
             category.setCateName(cateName);
-            category.setIcons(icons);
+            category.setIcons(iconName);
+
 
             try {
 
                 categoryService.insert(category);
+
 
                 resp.sendRedirect(
                         req.getContextPath()
                                 + "/admin/categories"
                 );
 
+
             } catch (Exception e) {
 
                 e.printStackTrace();
+
 
                 req.setAttribute(
                         "error",
                         e.getMessage()
                 );
 
+
                 req.setAttribute(
                         "category",
                         category
                 );
+
 
                 req.getRequestDispatcher(
                         "/views/admin/category-add.jsp"
@@ -175,17 +250,20 @@ public class CategoryController extends HttpServlet {
             }
         }
 
-        // Update Category
+
+        // =========================
+        // UPDATE
+        // =========================
+
         else if (url.contains("/admin/category/update")) {
 
             String id =
                     req.getParameter("cateId");
 
+
             String cateName =
                     req.getParameter("cateName");
 
-            String icons =
-                    req.getParameter("icons");
 
             if (id == null || id.isEmpty()) {
 
@@ -197,11 +275,28 @@ public class CategoryController extends HttpServlet {
                 return;
             }
 
-            int cateId =
-                    Integer.parseInt(id);
+
+            int cateId;
+
+            try {
+
+                cateId =
+                        Integer.parseInt(id);
+
+            } catch (NumberFormatException e) {
+
+                resp.sendRedirect(
+                        req.getContextPath()
+                                + "/admin/categories"
+                );
+
+                return;
+            }
+
 
             Category category =
                     categoryService.findById(cateId);
+
 
             if (category == null) {
 
@@ -213,36 +308,141 @@ public class CategoryController extends HttpServlet {
                 return;
             }
 
+
+            // Giữ ảnh cũ
+            String oldIcon =
+                    category.getIcons();
+
+
+            Part iconPart =
+                    req.getPart("icon");
+
+
+            // Nếu chọn ảnh mới
+            if (iconPart != null
+                    && iconPart.getSize() > 0) {
+
+                String newIcon =
+                        uploadImage(iconPart);
+
+                category.setIcons(newIcon);
+            }
+
+            // Nếu không chọn ảnh
+            // giữ nguyên ảnh cũ
+            else {
+
+                category.setIcons(oldIcon);
+            }
+
+
             category.setCateName(cateName);
-            category.setIcons(icons);
+
 
             try {
 
                 categoryService.update(category);
+
 
                 resp.sendRedirect(
                         req.getContextPath()
                                 + "/admin/categories"
                 );
 
+
             } catch (Exception e) {
 
                 e.printStackTrace();
+
 
                 req.setAttribute(
                         "error",
                         e.getMessage()
                 );
 
+
                 req.setAttribute(
                         "category",
                         category
                 );
+
 
                 req.getRequestDispatcher(
                         "/views/admin/category-edit.jsp"
                 ).forward(req, resp);
             }
         }
+    }
+
+
+    // ==================================================
+    // UPLOAD IMAGE
+    // ==================================================
+
+    private String uploadImage(
+            Part part)
+            throws IOException {
+
+        if (part == null
+                || part.getSize() == 0) {
+
+            return null;
+        }
+
+
+        String originalName =
+                Paths.get(
+                        part.getSubmittedFileName()
+                ).getFileName().toString();
+
+
+        if (originalName == null
+                || originalName.isEmpty()) {
+
+            return null;
+        }
+
+
+        String extension = "";
+
+        int dotIndex =
+                originalName.lastIndexOf(".");
+
+
+        if (dotIndex >= 0) {
+
+            extension =
+                    originalName.substring(dotIndex);
+        }
+
+
+        String fileName =
+                System.currentTimeMillis()
+                        + extension;
+
+
+        File uploadDir =
+                new File(Constant.DIR);
+
+
+        if (!uploadDir.exists()) {
+
+            uploadDir.mkdirs();
+        }
+
+
+        File file =
+                new File(
+                        uploadDir,
+                        fileName
+                );
+
+
+        part.write(
+                file.getAbsolutePath()
+        );
+
+
+        return fileName;
     }
 }
