@@ -6,9 +6,13 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import vn.iotstar.entity.User;
+import vn.iotstar.service.IOtpService;
 import vn.iotstar.service.IUserService;
+import vn.iotstar.service.impl.OtpServiceImpl;
 import vn.iotstar.service.impl.UserServiceImpl;
 import vn.iotstar.util.Constant;
+import vn.iotstar.util.EmailUtil;
 
 import java.io.IOException;
 import java.io.Serial;
@@ -18,6 +22,12 @@ public class RegisterController extends HttpServlet {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    private final IUserService userService =
+            new UserServiceImpl();
+
+    private final IOtpService otpService =
+            new OtpServiceImpl();
 
     @Override
     protected void doGet(
@@ -37,74 +47,198 @@ public class RegisterController extends HttpServlet {
             throws ServletException, IOException {
 
         req.setCharacterEncoding("UTF-8");
-        resp.setContentType("text/html;charset=UTF-8");
 
-        String username = req.getParameter("username");
-        String password = req.getParameter("password");
-        String email = req.getParameter("email");
-        String fullname = req.getParameter("fullname");
-        String phone = req.getParameter("phone");
+        String username =
+                trim(req.getParameter("username"));
+
+        String password =
+                req.getParameter("password");
+
+        String confirmPassword =
+                req.getParameter("confirmPassword");
+
+        String email =
+                trim(req.getParameter("email"));
+
+        String fullname =
+                trim(req.getParameter("fullname"));
+
+        String phone =
+                trim(req.getParameter("phone"));
+
+        // =========================
+        // VALIDATION
+        // =========================
 
         if (isEmpty(username)
                 || isEmpty(password)
+                || isEmpty(confirmPassword)
                 || isEmpty(email)
                 || isEmpty(fullname)
                 || isEmpty(phone)) {
 
-            req.setAttribute(
-                    "alert",
+            forwardError(
+                    req,
+                    resp,
                     "Vui lòng nhập đầy đủ thông tin!"
             );
 
-            req.getRequestDispatcher(
-                    Constant.REGISTER
-            ).forward(req, resp);
+            return;
+        }
+
+        if (!email.matches(
+                "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+
+            forwardError(
+                    req,
+                    resp,
+                    "Email không hợp lệ!"
+            );
 
             return;
         }
 
-        username = username.trim();
-        email = email.trim();
-        fullname = fullname.trim();
-        phone = phone.trim();
+        if (!password.equals(confirmPassword)) {
 
-        IUserService service = new UserServiceImpl();
+            forwardError(
+                    req,
+                    resp,
+                    "Mật khẩu xác nhận không giống nhau!"
+            );
 
-        if (service.checkExistEmail(email)) {
+            return;
+        }
 
-            req.setAttribute(
-                    "alert",
+        if (password.length() < 6) {
+
+            forwardError(
+                    req,
+                    resp,
+                    "Mật khẩu phải có ít nhất 6 ký tự!"
+            );
+
+            return;
+        }
+
+        // =========================
+        // CHECK EXIST
+        // =========================
+
+        if (userService.checkExistEmail(email)) {
+
+            forwardError(
+                    req,
+                    resp,
                     "Email đã tồn tại!"
             );
 
-            req.getRequestDispatcher(
-                    Constant.REGISTER
-            ).forward(req, resp);
-
             return;
         }
 
-        if (service.checkExistUsername(username)) {
+        if (userService.checkExistUsername(username)) {
 
-            req.setAttribute(
-                    "alert",
+            forwardError(
+                    req,
+                    resp,
                     "Tài khoản đã tồn tại!"
             );
 
-            req.getRequestDispatcher(
-                    Constant.REGISTER
-            ).forward(req, resp);
-
             return;
         }
 
-        if (service.checkExistPhone(phone)) {
+        if (userService.checkExistPhone(phone)) {
 
-            req.setAttribute(
-                    "alert",
+            forwardError(
+                    req,
+                    resp,
                     "Số điện thoại đã tồn tại!"
             );
 
+            return;
+        }
+
+        // =========================
+        // CREATE USER
+        // =========================
+
+        boolean success =
+                userService.register(
+                        email,
+                        password,
+                        username,
+                        fullname,
+                        phone
+                );
+
+        if (!success) {
+
+            forwardError(
+                    req,
+                    resp,
+                    "Đăng ký thất bại!"
+            );
+
+            return;
+        }
+
+        // =========================
+        // FIND USER
+        // =========================
+
+        User user =
+                userService.findByEmail(email);
+
+        if (user == null) {
+
+            forwardError(
+                    req,
+                    resp,
+                    "Không tìm thấy tài khoản vừa tạo!"
+            );
+
+            return;
+        }
+
+        // =========================
+        // CREATE OTP
+        // =========================
+
+        String otp =
+                otpService.generateOtp();
+
+        otpService.createOtp(
+                user.getId(),
+                Constant.OTP_REGISTER,
+                otp
+        );
+
+        // =========================
+        // SEND EMAIL
+        // =========================
+
+        try {
+
+            EmailUtil.sendOtp(
+                    user.getEmail(),
+                    otp,
+                    Constant.OTP_REGISTER
+            );
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            req.setAttribute(
+                    "alert",
+                    "Tạo tài khoản thành công nhưng không gửi được OTP. "
+                            + "Vui lòng kiểm tra cấu hình email."
+            );
+
+            req.setAttribute(
+                    "email",
+                    user.getEmail()
+            );
+
             req.getRequestDispatcher(
                     Constant.REGISTER
             ).forward(req, resp);
@@ -112,34 +246,50 @@ public class RegisterController extends HttpServlet {
             return;
         }
 
-        boolean success = service.register(
-                email,
-                password,
-                username,
-                fullname,
-                phone
+        // =========================
+        // SAVE SESSION OTP USER
+        // =========================
+
+        req.getSession(true).setAttribute(
+                "otpUserId",
+                user.getId()
         );
 
-        if (success) {
+        req.getSession(true).setAttribute(
+                "otpEmail",
+                user.getEmail()
+        );
 
-            resp.sendRedirect(
-                    req.getContextPath() + "/login"
-            );
+        resp.sendRedirect(
+                req.getContextPath()
+                        + "/verify-otp"
+        );
+    }
 
-        } else {
+    private void forwardError(
+            HttpServletRequest req,
+            HttpServletResponse resp,
+            String message)
+            throws ServletException, IOException {
 
-            req.setAttribute(
-                    "alert",
-                    "Đăng ký thất bại!"
-            );
+        req.setAttribute(
+                "alert",
+                message
+        );
 
-            req.getRequestDispatcher(
-                    Constant.REGISTER
-            ).forward(req, resp);
-        }
+        req.getRequestDispatcher(
+                Constant.REGISTER
+        ).forward(req, resp);
     }
 
     private boolean isEmpty(String value) {
-        return value == null || value.trim().isEmpty();
+        return value == null
+                || value.trim().isEmpty();
+    }
+
+    private String trim(String value) {
+        return value == null
+                ? null
+                : value.trim();
     }
 }

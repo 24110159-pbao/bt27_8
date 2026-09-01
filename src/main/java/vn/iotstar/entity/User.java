@@ -10,7 +10,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -66,8 +65,7 @@ public class User implements Serializable {
             String avatar,
             int roleid,
             String phone,
-            LocalDate createddate,
-            boolean active) {
+            LocalDate createddate) {
 
         this.email = email;
         this.username = username;
@@ -77,6 +75,6 @@ public class User implements Serializable {
         this.roleid = roleid;
         this.phone = phone;
         this.createddate = createddate;
-        this.active = active;
+        this.active = false;
     }
 }
