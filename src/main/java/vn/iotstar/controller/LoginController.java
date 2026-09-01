@@ -1,5 +1,8 @@
 package vn.iotstar.controller;
 
+import java.io.IOException;
+import java.io.Serial;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.Cookie;
@@ -12,9 +15,6 @@ import vn.iotstar.entity.User;
 import vn.iotstar.service.IUserService;
 import vn.iotstar.service.impl.UserServiceImpl;
 import vn.iotstar.util.Constant;
-
-import java.io.IOException;
-import java.io.Serial;
 
 @WebServlet("/login")
 public class LoginController extends HttpServlet {
@@ -31,7 +31,8 @@ public class LoginController extends HttpServlet {
         HttpSession session = req.getSession(false);
 
         if (session != null
-                && session.getAttribute(Constant.SESSION_ACCOUNT) != null) {
+                && session.getAttribute(
+                Constant.SESSION_ACCOUNT) != null) {
 
             resp.sendRedirect(
                     req.getContextPath() + "/waiting"
@@ -75,16 +76,59 @@ public class LoginController extends HttpServlet {
             return;
         }
 
+        username = username.trim();
+
         IUserService service = new UserServiceImpl();
 
+        /*
+         * Kiểm tra tài khoản trước.
+         */
+        User account =
+                service.findByUsername(username);
+
+        if (account == null) {
+
+            req.setAttribute(
+                    "alert",
+                    "Tài khoản hoặc mật khẩu không đúng"
+            );
+
+            req.getRequestDispatcher(
+                    Constant.LOGIN
+            ).forward(req, resp);
+
+            return;
+        }
+
+        /*
+         * Tài khoản chưa kích hoạt.
+         */
+        if (!account.isActive()) {
+
+            req.setAttribute(
+                    "alert",
+                    "Tài khoản chưa được kích hoạt. Vui lòng xác nhận OTP."
+            );
+
+            req.getRequestDispatcher(
+                    Constant.LOGIN
+            ).forward(req, resp);
+
+            return;
+        }
+
+        /*
+         * Kiểm tra username + password + active.
+         */
         User user = service.login(
-                username.trim(),
+                username,
                 password
         );
 
         if (user != null) {
 
-            HttpSession session = req.getSession(true);
+            HttpSession session =
+                    req.getSession(true);
 
             session.setAttribute(
                     Constant.SESSION_ACCOUNT,

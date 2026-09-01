@@ -13,6 +13,14 @@ public class Constant {
 
     public static final String REGISTER = "/views/register.jsp";
 
+    public static final String VERIFY_OTP =
+            "/views/verify-otp.jsp";
+
+    public static final String OTP_REGISTER =
+            "REGISTER";
+
+    public static final String OTP_FORGOT_PASSWORD =
+            "FORGOT_PASSWORD";
     private Constant() {
     }
 }

@@ -32,6 +32,7 @@
 
         </div>
 
+
         <% if (request.getAttribute("alert") != null) { %>
 
         <div class="alert alert-danger">
@@ -39,6 +40,7 @@
         </div>
 
         <% } %>
+
 
         <form method="post"
               action="${pageContext.request.contextPath}/register">
@@ -55,6 +57,7 @@
 
             </div>
 
+
             <div class="form-group">
 
                 <label>Tài khoản</label>
@@ -66,6 +69,7 @@
                        required>
 
             </div>
+
 
             <div class="form-group">
 
@@ -79,6 +83,7 @@
 
             </div>
 
+
             <div class="form-group">
 
                 <label>Số điện thoại</label>
@@ -91,6 +96,7 @@
 
             </div>
 
+
             <div class="form-group">
 
                 <label>Mật khẩu</label>
@@ -99,9 +105,25 @@
                        name="password"
                        class="form-control"
                        placeholder="••••••••"
+                       minlength="6"
                        required>
 
             </div>
+
+
+            <div class="form-group">
+
+                <label>Xác nhận mật khẩu</label>
+
+                <input type="password"
+                       name="confirmPassword"
+                       class="form-control"
+                       placeholder="Nhập lại mật khẩu"
+                       minlength="6"
+                       required>
+
+            </div>
+
 
             <button type="submit"
                     class="btn btn-primary btn-block">
@@ -111,6 +133,7 @@
             </button>
 
         </form>
+
 
         <div class="auth-footer">
 
@@ -127,4 +150,5 @@
 </div>
 
 </body>
+
 </html>

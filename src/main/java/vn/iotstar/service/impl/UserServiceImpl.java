@@ -124,6 +124,9 @@ public class UserServiceImpl implements IUserService {
             user.setRoleid(2);
             user.setCreateddate(LocalDate.now());
 
+            // User mới bắt buộc chưa active
+            user.setActive(false);
+
             userDao.insert(user);
 
             return true;

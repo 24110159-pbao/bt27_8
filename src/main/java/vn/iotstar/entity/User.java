@@ -51,12 +51,22 @@ public class User implements Serializable {
     @Column(name = "createddate", nullable = false)
     private LocalDate createddate;
 
+    @Column(name = "active", nullable = false)
+    private boolean active;
+
     public User() {
     }
 
-    public User(String email, String username, String fullname,
-                String password, String avatar, int roleid,
-                String phone, LocalDate createddate) {
+    public User(
+            String email,
+            String username,
+            String fullname,
+            String password,
+            String avatar,
+            int roleid,
+            String phone,
+            LocalDate createddate) {
+
         this.email = email;
         this.username = username;
         this.fullname = fullname;
@@ -65,6 +75,6 @@ public class User implements Serializable {
         this.roleid = roleid;
         this.phone = phone;
         this.createddate = createddate;
+        this.active = false;
     }
-
 }
