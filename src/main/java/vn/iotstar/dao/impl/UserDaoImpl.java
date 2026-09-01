@@ -117,12 +117,10 @@ public class UserDaoImpl implements UserDao {
 
         try {
 
-            String jpql =
-                    "SELECT u FROM User u " +
-                            "WHERE u.username = :username";
-
-            TypedQuery<User> query =
-                    em.createQuery(jpql, User.class);
+            TypedQuery<User> query = em.createQuery(
+                    "SELECT u FROM User u WHERE u.username = :username",
+                    User.class
+            );
 
             query.setParameter("username", username);
 
@@ -144,14 +142,37 @@ public class UserDaoImpl implements UserDao {
 
         try {
 
-            String jpql =
-                    "SELECT u FROM User u " +
-                            "WHERE u.email = :email";
-
-            TypedQuery<User> query =
-                    em.createQuery(jpql, User.class);
+            TypedQuery<User> query = em.createQuery(
+                    "SELECT u FROM User u WHERE u.email = :email",
+                    User.class
+            );
 
             query.setParameter("email", email);
+
+            try {
+                return query.getSingleResult();
+            } catch (NoResultException e) {
+                return null;
+            }
+
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public User findByPhone(String phone) {
+
+        EntityManager em = JPAConfig.getEntityManager();
+
+        try {
+
+            TypedQuery<User> query = em.createQuery(
+                    "SELECT u FROM User u WHERE u.phone = :phone",
+                    User.class
+            );
+
+            query.setParameter("phone", phone);
 
             try {
                 return query.getSingleResult();
@@ -171,13 +192,13 @@ public class UserDaoImpl implements UserDao {
 
         try {
 
-            String jpql =
+            TypedQuery<User> query = em.createQuery(
                     "SELECT u FROM User u " +
                             "WHERE u.username = :username " +
-                            "AND u.password = :password";
-
-            TypedQuery<User> query =
-                    em.createQuery(jpql, User.class);
+                            "AND u.password = :password " +
+                            "AND u.active = true",
+                    User.class
+            );
 
             query.setParameter("username", username);
             query.setParameter("password", password);
@@ -200,11 +221,10 @@ public class UserDaoImpl implements UserDao {
 
         try {
 
-            String jpql =
-                    "SELECT u FROM User u ORDER BY u.id ASC";
-
-            TypedQuery<User> query =
-                    em.createQuery(jpql, User.class);
+            TypedQuery<User> query = em.createQuery(
+                    "SELECT u FROM User u ORDER BY u.id ASC",
+                    User.class
+            );
 
             return query.getResultList();
 
@@ -220,11 +240,10 @@ public class UserDaoImpl implements UserDao {
 
         try {
 
-            String jpql =
-                    "SELECT u FROM User u ORDER BY u.id ASC";
-
-            TypedQuery<User> query =
-                    em.createQuery(jpql, User.class);
+            TypedQuery<User> query = em.createQuery(
+                    "SELECT u FROM User u ORDER BY u.id ASC",
+                    User.class
+            );
 
             query.setFirstResult(page * pageSize);
             query.setMaxResults(pageSize);
@@ -243,13 +262,12 @@ public class UserDaoImpl implements UserDao {
 
         try {
 
-            String jpql =
+            TypedQuery<User> query = em.createQuery(
                     "SELECT u FROM User u " +
                             "WHERE u.fullname LIKE :fullname " +
-                            "ORDER BY u.id ASC";
-
-            TypedQuery<User> query =
-                    em.createQuery(jpql, User.class);
+                            "ORDER BY u.id ASC",
+                    User.class
+            );
 
             query.setParameter(
                     "fullname",
@@ -270,12 +288,10 @@ public class UserDaoImpl implements UserDao {
 
         try {
 
-            String jpql =
-                    "SELECT COUNT(u) FROM User u";
-
-            Long count =
-                    em.createQuery(jpql, Long.class)
-                            .getSingleResult();
+            Long count = em.createQuery(
+                    "SELECT COUNT(u) FROM User u",
+                    Long.class
+            ).getSingleResult();
 
             return count.intValue();
 
@@ -283,31 +299,4 @@ public class UserDaoImpl implements UserDao {
             em.close();
         }
     }
-    @Override
-    public User findByPhone(String phone) {
-
-        EntityManager em = JPAConfig.getEntityManager();
-
-        try {
-
-            String jpql =
-                    "SELECT u FROM User u " +
-                            "WHERE u.phone = :phone";
-
-            TypedQuery<User> query =
-                    em.createQuery(jpql, User.class);
-
-            query.setParameter("phone", phone);
-
-            try {
-                return query.getSingleResult();
-            } catch (NoResultException e) {
-                return null;
-            }
-
-        } finally {
-            em.close();
-        }
-    }
-
 }

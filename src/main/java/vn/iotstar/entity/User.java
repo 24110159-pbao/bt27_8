@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -51,12 +52,23 @@ public class User implements Serializable {
     @Column(name = "createddate", nullable = false)
     private LocalDate createddate;
 
+    @Column(name = "active", nullable = false)
+    private boolean active;
+
     public User() {
     }
 
-    public User(String email, String username, String fullname,
-                String password, String avatar, int roleid,
-                String phone, LocalDate createddate) {
+    public User(
+            String email,
+            String username,
+            String fullname,
+            String password,
+            String avatar,
+            int roleid,
+            String phone,
+            LocalDate createddate,
+            boolean active) {
+
         this.email = email;
         this.username = username;
         this.fullname = fullname;
@@ -65,6 +77,6 @@ public class User implements Serializable {
         this.roleid = roleid;
         this.phone = phone;
         this.createddate = createddate;
+        this.active = active;
     }
-
 }

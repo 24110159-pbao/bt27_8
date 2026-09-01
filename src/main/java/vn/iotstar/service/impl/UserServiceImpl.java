@@ -23,7 +23,10 @@ public class UserServiceImpl implements IUserService {
             throw new RuntimeException("Email đã tồn tại");
         }
 
-        if (checkExistPhone(user.getPhone())) {
+        if (user.getPhone() != null
+                && !user.getPhone().trim().isEmpty()
+                && checkExistPhone(user.getPhone())) {
+
             throw new RuntimeException("Số điện thoại đã tồn tại");
         }
 
@@ -99,6 +102,11 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public boolean checkExistPhone(String phone) {
+
+        if (phone == null || phone.trim().isEmpty()) {
+            return false;
+        }
+
         return userDao.findByPhone(phone) != null;
     }
 
@@ -110,29 +118,26 @@ public class UserServiceImpl implements IUserService {
             String fullname,
             String phone) {
 
-        try {
+        User user = new User();
 
-            User user = new User();
+        user.setEmail(email);
+        user.setPassword(password);
+        user.setUsername(username);
+        user.setFullname(fullname);
+        user.setPhone(phone);
 
-            user.setEmail(email);
-            user.setPassword(password);
-            user.setUsername(username);
-            user.setFullname(fullname);
-            user.setPhone(phone);
+        user.setAvatar(null);
+        user.setRoleid(2);
+        user.setCreateddate(LocalDate.now());
 
-            user.setAvatar(null);
-            user.setRoleid(2);
-            user.setCreateddate(LocalDate.now());
+        /*
+         * User mới đăng ký bắt buộc chưa active.
+         * Sau khi xác nhận OTP mới chuyển thành true.
+         */
+        user.setActive(false);
 
-            userDao.insert(user);
+        userDao.insert(user);
 
-            return true;
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-
-            return false;
-        }
+        return true;
     }
 }
