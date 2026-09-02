@@ -67,6 +67,17 @@ List<Category> listCategory =
 
         </a>
 
+        <!-- Sản phẩm -->
+        <a href="${pageContext.request.contextPath}/admin/products"
+           class="menu-item">
+
+            🛍
+
+            <span>
+                Sản phẩm
+            </span>
+
+        </a>
 
         <!-- Video -->
 
