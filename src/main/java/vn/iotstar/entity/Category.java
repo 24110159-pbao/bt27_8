@@ -5,6 +5,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -36,7 +38,11 @@ public class Category implements Serializable {
     @Column(name = "icons", length = 255)
     private String icons;
 
-    @OneToMany(mappedBy = "category")
+    @OneToMany(
+            mappedBy = "category",
+            cascade = CascadeType.ALL,
+            orphanRemoval = false
+    )
     private List<Video> videos = new ArrayList<>();
 
     @OneToMany(mappedBy = "category")
