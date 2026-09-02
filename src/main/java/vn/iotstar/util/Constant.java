@@ -21,6 +21,13 @@ public class Constant {
 
     public static final String OTP_FORGOT_PASSWORD =
             "FORGOT_PASSWORD";
+
+    public static final String FORGOT_PASSWORD =
+            "/views/forgot-password.jsp";
+
+    public static final String RESET_PASSWORD =
+            "/views/reset-password.jsp";
+
     private Constant() {
     }
 }

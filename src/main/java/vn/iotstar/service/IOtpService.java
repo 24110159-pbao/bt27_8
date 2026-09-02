@@ -11,4 +11,6 @@ public interface IOtpService {
             String otp,
             String type
     );
+    void sendForgotPasswordOtp(String email);
+
 }

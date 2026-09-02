@@ -20,6 +20,8 @@
         <class>vn.iotstar.entity.Video</class>
         <class>vn.iotstar.entity.User</class>
         <class>vn.iotstar.entity.OtpVerification</class>
+        <class>vn.iotstar.entity.Product</class>
+
         <properties>
 
             <!-- ====================== -->

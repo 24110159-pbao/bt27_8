@@ -1,101 +1,104 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
-<!DOCTYPE html>
-<html lang="vi">
+<!DOCTYPE html> <html lang="vi"> <head> <meta charset="UTF-8"> <title>Đăng nhập - Shopping MVC</title>
+<link rel="stylesheet"
+      href="${pageContext.request.contextPath}/css/style.css">
 
-<head>
-    <meta charset="UTF-8">
-    <title>Đăng nhập - Shopping MVC</title>
+</head> <body> <div class="auth-page">
+<div class="auth-box">
 
-    <link rel="stylesheet"
-          href="${pageContext.request.contextPath}/css/style.css">
-</head>
+    <div class="auth-logo">
 
-<body>
+        <div class="logo-icon">
+            🛒
+        </div>
 
-<div class="auth-page">
+        <h2>Shopping MVC</h2>
 
-    <div class="auth-box">
+        <p>Đăng nhập vào hệ thống</p>
 
-        <div class="auth-logo">
+    </div>
 
-            <div class="logo-icon">
-                🛒
-            </div>
+    <% if (request.getAttribute("alert") != null) { %>
 
-            <h2>Shopping MVC</h2>
+    <div class="alert alert-danger">
+        <%= request.getAttribute("alert") %>
+    </div>
 
-            <p>Đăng nhập vào hệ thống</p>
+    <% } %>
+
+    <% if (request.getAttribute("alertSuccess") != null) { %>
+
+    <div class="alert alert-success">
+        <%= request.getAttribute("alertSuccess") %>
+    </div>
+
+    <% } %>
+
+    <form method="post"
+          action="${pageContext.request.contextPath}/login">
+
+        <div class="form-group">
+
+            <label>Tài khoản</label>
+
+            <input type="text"
+                   name="username"
+                   class="form-control"
+                   placeholder="Nhập tài khoản"
+                   required>
 
         </div>
 
-        <% if (request.getAttribute("alert") != null) { %>
+        <div class="form-group">
 
-        <div class="alert alert-danger">
-            <%= request.getAttribute("alert") %>
-        </div>
+            <label>Mật khẩu</label>
 
-        <% } %>
-
-        <form method="post"
-              action="${pageContext.request.contextPath}/login">
-
-            <div class="form-group">
-
-                <label>Tài khoản</label>
-
-                <input type="text"
-                       name="username"
-                       class="form-control"
-                       placeholder="Nhập tài khoản"
-                       required>
-
-            </div>
-
-            <div class="form-group">
-
-                <label>Mật khẩu</label>
-
-                <input type="password"
-                       name="password"
-                       class="form-control"
-                       placeholder="Nhập mật khẩu"
-                       required>
-
-            </div>
-
-            <div style="margin-bottom:20px;">
-
-                <label>
-                    <input type="checkbox"
-                           name="remember">
-                    Ghi nhớ đăng nhập
-                </label>
-
-            </div>
-
-            <button type="submit"
-                    class="btn btn-primary btn-block">
-
-                Đăng nhập
-
-            </button>
-
-        </form>
-
-        <div class="auth-footer">
-
-            Chưa có tài khoản?
-
-            <a href="${pageContext.request.contextPath}/register">
-                Đăng ký ngay
-            </a>
+            <input type="password"
+                   name="password"
+                   class="form-control"
+                   placeholder="Nhập mật khẩu"
+                   required>
 
         </div>
+
+        <div style="margin-bottom:20px;">
+
+            <label>
+                <input type="checkbox"
+                       name="remember">
+                Ghi nhớ đăng nhập
+            </label>
+
+        </div>
+
+        <button type="submit"
+                class="btn btn-primary btn-block">
+
+            Đăng nhập
+
+        </button>
+
+    </form>
+
+    <div class="auth-footer">
+
+        <a href="${pageContext.request.contextPath}/forgot-password">
+            Quên mật khẩu?
+        </a>
+
+    </div>
+
+    <div class="auth-footer">
+
+        Chưa có tài khoản?
+
+        <a href="${pageContext.request.contextPath}/register">
+            Đăng ký ngay
+        </a>
 
     </div>
 
 </div>
 
-</body>
-</html>
+</div> </body> </html>

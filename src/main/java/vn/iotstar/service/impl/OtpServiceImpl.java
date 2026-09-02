@@ -9,6 +9,8 @@ import vn.iotstar.entity.OtpVerification;
 import vn.iotstar.entity.User;
 import vn.iotstar.service.IOtpService;
 import vn.iotstar.service.IUserService;
+import vn.iotstar.util.Constant;
+import vn.iotstar.util.EmailUtil;
 
 public class OtpServiceImpl implements IOtpService {
 
@@ -108,4 +110,62 @@ public class OtpServiceImpl implements IOtpService {
 
         return true;
     }
+    @Override
+    public void sendForgotPasswordOtp(String email) {
+
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Vui lòng nhập email!"
+            );
+        }
+
+        email = email.trim();
+
+        User user =
+                userService.findByEmail(email);
+
+        if (user == null) {
+            throw new IllegalArgumentException(
+                    "Email không tồn tại trong hệ thống!"
+            );
+        }
+
+        if (!user.isActive()) {
+            throw new IllegalArgumentException(
+                    "Tài khoản chưa được kích hoạt!"
+            );
+        }
+
+        String otp =
+                generateOtp();
+
+        /*
+         * Vô hiệu hóa OTP cũ
+         * và tạo OTP mới.
+         */
+        createOtp(
+                user.getId(),
+                Constant.OTP_FORGOT_PASSWORD,
+                otp
+        );
+
+        try {
+
+            EmailUtil.sendOtp(
+                    user.getEmail(),
+                    otp,
+                    Constant.OTP_FORGOT_PASSWORD
+            );
+
+        } catch (Exception e) {
+
+            throw new RuntimeException(
+                    "Không thể gửi OTP qua email!",
+                    e
+            );
+        }
+    }
+
+
+
 }
