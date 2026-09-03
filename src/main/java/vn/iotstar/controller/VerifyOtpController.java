@@ -13,7 +13,6 @@ import vn.iotstar.service.IUserService;
 import vn.iotstar.service.impl.OtpServiceImpl;
 import vn.iotstar.service.impl.UserServiceImpl;
 import vn.iotstar.util.Constant;
-import vn.iotstar.util.EmailUtil;
 
 import java.io.IOException;
 import java.io.Serial;
@@ -39,8 +38,51 @@ public class VerifyOtpController extends HttpServlet {
         HttpSession session =
                 req.getSession(false);
 
+        String type =
+                req.getParameter("type");
+
+        /*
+         * ========================================
+         * FORGOT PASSWORD
+         * ========================================
+         */
+        if (Constant.OTP_FORGOT_PASSWORD.equals(type)) {
+
+            if (session == null
+                    || session.getAttribute(
+                    "forgotPasswordEmail"
+            ) == null) {
+
+                resp.sendRedirect(
+                        req.getContextPath()
+                                + "/forgot-password"
+                );
+
+                return;
+            }
+
+            req.setAttribute(
+                    "type",
+                    Constant.OTP_FORGOT_PASSWORD
+            );
+
+            req.getRequestDispatcher(
+                    Constant.VERIFY_OTP
+            ).forward(req, resp);
+
+            return;
+        }
+
+        /*
+         * ========================================
+         * REGISTER
+         * ========================================
+         */
+
         if (session == null
-                || session.getAttribute("otpUserId") == null) {
+                || session.getAttribute(
+                "otpUserId"
+        ) == null) {
 
             resp.sendRedirect(
                     req.getContextPath()
@@ -49,6 +91,11 @@ public class VerifyOtpController extends HttpServlet {
 
             return;
         }
+
+        req.setAttribute(
+                "type",
+                Constant.OTP_REGISTER
+        );
 
         req.getRequestDispatcher(
                 Constant.VERIFY_OTP
@@ -66,8 +113,146 @@ public class VerifyOtpController extends HttpServlet {
         HttpSession session =
                 req.getSession(false);
 
-        if (session == null
-                || session.getAttribute("otpUserId") == null) {
+        if (session == null) {
+
+            resp.sendRedirect(
+                    req.getContextPath()
+                            + "/login"
+            );
+
+            return;
+        }
+
+        String type =
+                req.getParameter("type");
+
+        String otp =
+                req.getParameter("otp");
+
+        /*
+         * OTP phải gồm đúng 6 chữ số
+         */
+        if (otp == null
+                || !otp.matches("\\d{6}")) {
+
+            req.setAttribute(
+                    "alert",
+                    "OTP phải gồm đúng 6 chữ số!"
+            );
+
+            req.setAttribute(
+                    "type",
+                    type
+            );
+
+            req.getRequestDispatcher(
+                    Constant.VERIFY_OTP
+            ).forward(req, resp);
+
+            return;
+        }
+
+        /*
+         * ========================================
+         * FORGOT PASSWORD
+         * ========================================
+         */
+        if (Constant.OTP_FORGOT_PASSWORD.equals(type)) {
+
+            String email =
+                    (String) session.getAttribute(
+                            "forgotPasswordEmail"
+                    );
+
+            if (email == null
+                    || email.isBlank()) {
+
+                resp.sendRedirect(
+                        req.getContextPath()
+                                + "/forgot-password"
+                );
+
+                return;
+            }
+
+            User user =
+                    userService.findByEmail(email);
+
+            if (user == null) {
+
+                req.setAttribute(
+                        "alert",
+                        "Không tìm thấy tài khoản!"
+                );
+
+                req.setAttribute(
+                        "type",
+                        Constant.OTP_FORGOT_PASSWORD
+                );
+
+                req.getRequestDispatcher(
+                        Constant.VERIFY_OTP
+                ).forward(req, resp);
+
+                return;
+            }
+
+            boolean valid =
+                    otpService.verifyOtp(
+                            user.getId(),
+                            otp,
+                            Constant.OTP_FORGOT_PASSWORD
+                    );
+
+            if (!valid) {
+
+                req.setAttribute(
+                        "alert",
+                        "OTP không đúng hoặc đã hết hạn!"
+                );
+
+                req.setAttribute(
+                        "type",
+                        Constant.OTP_FORGOT_PASSWORD
+                );
+
+                req.getRequestDispatcher(
+                        Constant.VERIFY_OTP
+                ).forward(req, resp);
+
+                return;
+            }
+
+            /*
+             * OTP chính xác.
+             *
+             * Cho phép người dùng reset password.
+             */
+            session.setAttribute(
+                    "forgotPasswordVerified",
+                    true
+            );
+
+            resp.sendRedirect(
+                    req.getContextPath()
+                            + "/reset-password"
+            );
+
+            return;
+        }
+
+        /*
+         * ========================================
+         * REGISTER
+         * ========================================
+         */
+
+        Object userIdObject =
+                session.getAttribute(
+                        "otpUserId"
+                );
+
+        if (userIdObject == null) {
 
             resp.sendRedirect(
                     req.getContextPath()
@@ -78,27 +263,7 @@ public class VerifyOtpController extends HttpServlet {
         }
 
         int userId =
-                (Integer) session.getAttribute(
-                        "otpUserId"
-                );
-
-        String otp =
-                req.getParameter("otp");
-
-        if (otp == null
-                || !otp.matches("\\d{6}")) {
-
-            req.setAttribute(
-                    "alert",
-                    "OTP phải gồm đúng 6 chữ số!"
-            );
-
-            req.getRequestDispatcher(
-                    Constant.VERIFY_OTP
-            ).forward(req, resp);
-
-            return;
-        }
+                (Integer) userIdObject;
 
         boolean valid =
                 otpService.verifyOtp(
@@ -112,6 +277,11 @@ public class VerifyOtpController extends HttpServlet {
             req.setAttribute(
                     "alert",
                     "OTP không đúng hoặc đã hết hạn!"
+            );
+
+            req.setAttribute(
+                    "type",
+                    Constant.OTP_REGISTER
             );
 
             req.getRequestDispatcher(
@@ -131,6 +301,11 @@ public class VerifyOtpController extends HttpServlet {
                     "Không tìm thấy tài khoản!"
             );
 
+            req.setAttribute(
+                    "type",
+                    Constant.OTP_REGISTER
+            );
+
             req.getRequestDispatcher(
                     Constant.VERIFY_OTP
             ).forward(req, resp);
@@ -138,26 +313,24 @@ public class VerifyOtpController extends HttpServlet {
             return;
         }
 
-        // Kích hoạt tài khoản
+        /*
+         * Kích hoạt tài khoản
+         */
         user.setActive(true);
 
         userService.update(user);
 
-        session.removeAttribute("otpUserId");
-        session.removeAttribute("otpEmail");
+        session.removeAttribute(
+                "otpUserId"
+        );
+
+        session.removeAttribute(
+                "otpEmail"
+        );
 
         resp.sendRedirect(
                 req.getContextPath()
                         + "/login?activated=true"
         );
-    }
-
-    @Override
-    protected void doPut(
-            HttpServletRequest req,
-            HttpServletResponse resp)
-            throws ServletException, IOException {
-
-        // Không sử dụng
     }
 }

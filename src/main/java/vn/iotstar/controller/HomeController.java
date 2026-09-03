@@ -1,21 +1,41 @@
 package vn.iotstar.controller;
 
+import java.io.IOException;
+import java.io.Serial;
+import java.util.List;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.io.IOException;
+import vn.iotstar.entity.Product;
+import vn.iotstar.service.IProductService;
+import vn.iotstar.service.impl.ProductServiceImpl;
 
 @WebServlet("/home")
 public class HomeController extends HttpServlet {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    private final IProductService productService =
+            new ProductServiceImpl();
 
     @Override
     protected void doGet(
             HttpServletRequest req,
             HttpServletResponse resp)
             throws ServletException, IOException {
+
+        List<Product> listProduct =
+                productService.findTop10Newest();
+
+        req.setAttribute(
+                "listProduct",
+                listProduct
+        );
 
         req.getRequestDispatcher(
                 "/views/home.jsp"

@@ -40,6 +40,14 @@ public class LoginController extends HttpServlet {
 
             return;
         }
+        if ("true".equals(req.getParameter("reset"))) {
+
+            req.setAttribute(
+                    "alertSuccess",
+                    "Đặt lại mật khẩu thành công! Vui lòng đăng nhập."
+            );
+        }
+
 
         req.getRequestDispatcher(
                 Constant.LOGIN
