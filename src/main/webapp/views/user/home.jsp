@@ -61,7 +61,7 @@
         </a>
 
 
-        <a href="${pageContext.request.contextPath}/profile">
+        <a href="${pageContext.request.contextPath}/user/profile">
 
             Hồ sơ
 
