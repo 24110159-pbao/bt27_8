@@ -33,13 +33,32 @@ public class UserServiceImpl implements IUserService {
     @Override
     public void update(User user) {
 
-        User oldUser = userDao.findById(user.getId());
+        User oldUser =
+                userDao.findById(user.getId());
 
         if (oldUser == null) {
-            throw new RuntimeException("Không tìm thấy User");
+            throw new RuntimeException(
+                    "Không tìm thấy User"
+            );
         }
 
-        userDao.update(user);
+        /*
+         * Chỉ cho phép Profile cập nhật
+         * các thông tin cá nhân.
+         */
+        oldUser.setFullname(
+                user.getFullname()
+        );
+
+        oldUser.setPhone(
+                user.getPhone()
+        );
+
+        oldUser.setAvatar(
+                user.getAvatar()
+        );
+
+        userDao.update(oldUser);
     }
 
     @Override
@@ -137,5 +156,8 @@ public class UserServiceImpl implements IUserService {
 
             return false;
         }
+    }
+    @Override public User findByPhone(String phone) {
+        return userDao.findByPhone(phone);
     }
 }
