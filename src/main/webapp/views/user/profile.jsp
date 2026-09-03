@@ -55,7 +55,7 @@
 
 
         <a class="active"
-           href="${pageContext.request.contextPath}/profile">
+           href="${pageContext.request.contextPath}/user/profile">
 
             Hồ sơ
 
@@ -67,11 +67,11 @@
 
             <c:choose>
 
-                <c:when test="${not empty user.avatar}">
+                <c:when test="${not empty currentUser.avatar}">
 
                     <img
                             class="user-avatar-small"
-                            src="${pageContext.request.contextPath}/image?fname=${user.avatar}"
+                            src="${pageContext.request.contextPath}/image?fname=${currentUser.avatar}"
                             alt="Avatar">
 
                 </c:when>
@@ -81,7 +81,7 @@
 
                     <div class="user-avatar-default">
 
-                        ${user.fullname.substring(0,1)}
+                        ${currentUser.fullname.substring(0,1)}
 
                     </div>
 
@@ -92,7 +92,7 @@
 
             <span class="user-name">
 
-                ${user.fullname}
+                ${currentUser.fullname}
 
             </span>
 
@@ -154,10 +154,10 @@
                 <c:choose>
 
 
-                    <c:when test="${not empty user.avatar}">
+                    <c:when test="${not empty currentUser.avatar}">
 
                         <img
-                                src="${pageContext.request.contextPath}/image?fname=${user.avatar}"
+                                src="${pageContext.request.contextPath}/image?fname=${currentUser.avatar}"
                                 alt="Avatar">
 
                     </c:when>
@@ -167,7 +167,7 @@
 
                         <div class="profile-avatar-placeholder">
 
-                            ${user.fullname.substring(0,1)}
+                            ${currentUser.fullname.substring(0,1)}
 
                         </div>
 
@@ -182,14 +182,14 @@
 
             <h2>
 
-                ${user.fullname}
+                ${currentUser.fullname}
 
             </h2>
 
 
             <p>
 
-                @${user.username}
+                @${currentUser.username}
 
             </p>
 
@@ -251,7 +251,7 @@
 
             <form
                     class="profile-form"
-                    action="${pageContext.request.contextPath}/profile"
+                    action="${pageContext.request.contextPath}/user/profile"
                     method="post"
                     enctype="multipart/form-data">
 
@@ -266,7 +266,7 @@
 
                     <input
                             type="text"
-                            value="${user.username}"
+                            value="${currentUser.username}"
                             readonly>
 
                 </div>
@@ -283,7 +283,7 @@
 
                     <input
                             type="email"
-                            value="${user.email}"
+                            value="${currentUser.email}"
                             readonly>
 
                 </div>
@@ -302,7 +302,7 @@
                             type="text"
                             id="fullname"
                             name="fullname"
-                            value="${user.fullname}"
+                            value="${currentUser.fullname}"
                             placeholder="Nhập họ và tên"
                             required>
 
@@ -322,7 +322,7 @@
                             type="text"
                             id="phone"
                             name="phone"
-                            value="${user.phone}"
+                            value="${currentUser.phone}"
                             placeholder="Nhập số điện thoại"
                             required>
 
