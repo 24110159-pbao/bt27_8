@@ -13,24 +13,36 @@
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/css/style.css">
 
+    <link rel="stylesheet"
+              href="${pageContext.request.contextPath}/css/client-product.css">
+
 </head>
 
 
-<body>
+<body class="client-page">
 
+<header class="client-header">
 
-<header>
+    <a class="client-logo"
+       href="${pageContext.request.contextPath}/home">
 
-    <h1>Shopping Service</h1>
+        Shopping<span>Service</span>
 
-    <nav>
+    </a>
+
+    <nav class="client-nav">
 
         <a href="${pageContext.request.contextPath}/home">
             Trang chủ
         </a>
 
-        <a href="${pageContext.request.contextPath}/product">
+        <a class="active"
+           href="${pageContext.request.contextPath}/product">
             Sản phẩm
+        </a>
+
+        <a href="${pageContext.request.contextPath}/login">
+            Đăng nhập
         </a>
 
     </nav>
@@ -38,9 +50,17 @@
 </header>
 
 
-<main>
+<main class="client-container">
 
-    <h2>Tất cả sản phẩm</h2>
+    <div class="client-page-title">
+
+        <h1>Tất cả sản phẩm</h1>
+
+        <p>
+            Khám phá các sản phẩm đang được bán tại cửa hàng
+        </p>
+
+    </div>
 
 
     <div class="product-grid">
@@ -55,26 +75,25 @@
 
                     <div class="product-card">
 
-
-                        <!-- ===================== -->
-                        <!-- IMAGE -->
-                        <!-- ===================== -->
-
                         <a href="${pageContext.request.contextPath}/product-detail?id=${product.id}">
 
                             <c:choose>
 
                                 <c:when test="${not empty product.image}">
 
-                                    <img
+                                    <div class="product-card-image">
+
+                                        <img
                                             src="${pageContext.request.contextPath}/image?fname=${product.image}"
                                             alt="${product.name}">
+
+                                    </div>
 
                                 </c:when>
 
                                 <c:otherwise>
 
-                                    <div class="no-image">
+                                    <div class="product-card-no-image">
                                         Không có hình
                                     </div>
 
@@ -85,12 +104,7 @@
                         </a>
 
 
-                        <!-- ===================== -->
-                        <!-- INFORMATION -->
-                        <!-- ===================== -->
-
                         <div class="product-info">
-
 
                             <h3>
 
@@ -118,13 +132,12 @@
                             </p>
 
 
-                            <p>
+                            <p class="quantity">
 
-                                Số lượng:
-                                ${product.quantity}
+                                Còn lại:
+                                ${product.quantity} sản phẩm
 
                             </p>
-
 
                         </div>
 
@@ -137,9 +150,11 @@
 
             <c:otherwise>
 
-                <p>
+                <div class="product-empty">
+
                     Không có sản phẩm.
-                </p>
+
+                </div>
 
             </c:otherwise>
 
@@ -148,16 +163,11 @@
     </div>
 
 
-    <!-- ===================== -->
     <!-- PAGINATION -->
-    <!-- ===================== -->
 
     <c:if test="${totalPage > 1}">
 
         <div class="pagination">
-
-
-            <!-- PREVIOUS -->
 
             <c:if test="${currentPage > 1}">
 
@@ -167,8 +177,6 @@
 
             </c:if>
 
-
-            <!-- PAGE NUMBER -->
 
             <c:forEach
                     begin="1"
@@ -185,7 +193,6 @@
 
                     </c:when>
 
-
                     <c:otherwise>
 
                         <a href="${pageContext.request.contextPath}/product?page=${page}">
@@ -199,8 +206,6 @@
             </c:forEach>
 
 
-            <!-- NEXT -->
-
             <c:if test="${currentPage < totalPage}">
 
                 <a href="${pageContext.request.contextPath}/product?page=${currentPage + 1}">
@@ -209,13 +214,12 @@
 
             </c:if>
 
-
         </div>
 
     </c:if>
 
-
 </main>
 
 </body>
+
 </html>

@@ -10,15 +10,27 @@
 
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/css/style.css">
+
+    <link rel="stylesheet"
+              href="${pageContext.request.contextPath}/css/client-product.css">
+
 </head>
 
-<body>
+<body class="client-page">
 
-<header>
-    <h1>Shopping Service</h1>
+<header class="client-header">
 
-    <nav>
-        <a href="${pageContext.request.contextPath}/home">
+    <a class="client-logo"
+       href="${pageContext.request.contextPath}/home">
+
+        Shopping<span>Service</span>
+
+    </a>
+
+    <nav class="client-nav">
+
+        <a class="active"
+           href="${pageContext.request.contextPath}/home">
             Trang chủ
         </a>
 
@@ -29,96 +41,123 @@
         <a href="${pageContext.request.contextPath}/login">
             Đăng nhập
         </a>
+
     </nav>
+
 </header>
 
 
-<main>
+<main class="client-container">
 
-    <section>
+    <div class="client-page-title">
 
-        <h2>Sản phẩm mới nhất</h2>
+        <h1>Sản phẩm mới nhất</h1>
 
-        <div class="product-grid">
+        <p>
+            Những sản phẩm mới được cập nhật tại cửa hàng
+        </p>
 
-            <c:choose>
+    </div>
 
-                <c:when test="${not empty listProduct}">
 
-                    <c:forEach
-                            var="product"
-                            items="${listProduct}">
+    <div class="product-grid">
 
-                        <div class="product-card">
+        <c:choose>
 
-                            <a href="${pageContext.request.contextPath}/product-detail?id=${product.id}">
+            <c:when test="${not empty listProduct}">
 
-                                <c:choose>
+                <c:forEach
+                        var="product"
+                        items="${listProduct}">
 
-                                    <c:when test="${not empty product.image}">
+                    <div class="product-card">
+
+                        <a href="${pageContext.request.contextPath}/product-detail?id=${product.id}">
+
+                            <c:choose>
+
+                                <c:when test="${not empty product.image}">
+
+                                    <div class="product-card-image">
+
                                         <img
-                                                src="${pageContext.request.contextPath}/image?fname=${product.image}"
-                                                alt="${product.name}">
-                                    </c:when>
+                                            src="${pageContext.request.contextPath}/image?fname=${product.image}"
+                                            alt="${product.name}">
 
-                                    <c:otherwise>
-                                        <div class="no-image">
-                                            Không có hình
-                                        </div>
-                                    </c:otherwise>
+                                    </div>
 
-                                </c:choose>
+                                </c:when>
 
-                            </a>
+                                <c:otherwise>
 
+                                    <div class="product-card-no-image">
+                                        Không có hình
+                                    </div>
 
-                            <div class="product-info">
+                                </c:otherwise>
 
-                                <h3>
-                                    <a href="${pageContext.request.contextPath}/product-detail?id=${product.id}">
-                                        ${product.name}
-                                    </a>
-                                </h3>
+                            </c:choose>
+
+                        </a>
 
 
-                                <p class="category">
-                                    Danh mục:
-                                    ${product.category.cateName}
-                                </p>
+                        <div class="product-info">
+
+                            <h3>
+
+                                <a href="${pageContext.request.contextPath}/product-detail?id=${product.id}">
+
+                                    ${product.name}
+
+                                </a>
+
+                            </h3>
 
 
-                                <p class="price">
-                                    ${product.price} VNĐ
-                                </p>
+                            <p class="category">
+
+                                Danh mục:
+                                ${product.category.cateName}
+
+                            </p>
 
 
-                                <p>
-                                    Còn lại:
-                                    ${product.quantity}
-                                </p>
+                            <p class="price">
 
-                            </div>
+                                ${product.price} VNĐ
+
+                            </p>
+
+
+                            <p class="quantity">
+
+                                Còn lại:
+                                ${product.quantity} sản phẩm
+
+                            </p>
 
                         </div>
 
-                    </c:forEach>
+                    </div>
 
-                </c:when>
+                </c:forEach>
+
+            </c:when>
 
 
-                <c:otherwise>
+            <c:otherwise>
 
-                    <p>
-                        Hiện chưa có sản phẩm.
-                    </p>
+                <div class="product-empty">
 
-                </c:otherwise>
+                    Hiện chưa có sản phẩm.
 
-            </c:choose>
+                </div>
 
-        </div>
+            </c:otherwise>
 
-    </section>
+        </c:choose>
+
+    </div>
 
 </main>
 
