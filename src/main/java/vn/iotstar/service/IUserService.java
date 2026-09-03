@@ -34,6 +34,8 @@ public interface IUserService {
 
     boolean checkExistPhone(String phone);
 
+    User findByPhone(String phone);
+
     boolean register(
             String email,
             String password,

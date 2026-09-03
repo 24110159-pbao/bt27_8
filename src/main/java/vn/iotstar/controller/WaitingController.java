@@ -54,7 +54,7 @@ public class WaitingController extends HttpServlet {
         } else if (user.getRoleid() == 2) {
 
             resp.sendRedirect(
-                    req.getContextPath() + "/home"
+                    req.getContextPath() + "/user/home"
             );
 
         } else {

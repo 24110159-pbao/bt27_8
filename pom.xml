@@ -139,6 +139,24 @@
             <version>2.0.4</version>
         </dependency>
 
+        <!-- ============================== -->
+        <!-- SiteMesh 3 - Jakarta EE 11    -->
+        <!-- Tomcat 11 / Servlet 6.1       -->
+        <!-- ============================== -->
+
+        <dependency>
+            <groupId>org.sitemesh</groupId>
+            <artifactId>sitemesh</artifactId>
+            <version>3.3.0-M3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.sitemesh</groupId>
+            <artifactId>sitemesh-webfilter</artifactId>
+            <version>3.3.0-M3</version>
+        </dependency>
+
+
 
     </dependencies>
 
