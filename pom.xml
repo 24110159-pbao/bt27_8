@@ -29,7 +29,7 @@
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
-            <version>6.1.0</version>
+            <version>6.0.0</version>
             <scope>provided</scope>
         </dependency>
 
@@ -40,7 +40,7 @@
         <dependency>
             <groupId>jakarta.servlet.jsp</groupId>
             <artifactId>jakarta.servlet.jsp-api</artifactId>
-            <version>4.0.0</version>
+            <version>3.1.1</version>
             <scope>provided</scope>
         </dependency>
 
@@ -141,14 +141,8 @@
 
         <dependency>
             <groupId>org.sitemesh</groupId>
-            <artifactId>sitemesh</artifactId>
-            <version>3.3.0-RC1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.sitemesh</groupId>
             <artifactId>sitemesh-webfilter</artifactId>
-            <version>3.3.0-RC1</version>
+            <version>3.2.3</version>
         </dependency>
 
 
