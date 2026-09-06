@@ -4,7 +4,7 @@
 
     <mapping
             path="/user/*"
-            decorator="/WEB-INF/decorators/main.jsp"/>
+            decorator="main.jsp"/>
 
     <mapping
             path="/css/*"
