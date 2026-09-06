@@ -139,6 +139,18 @@
             <version>2.0.4</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.sitemesh</groupId>
+            <artifactId>sitemesh</artifactId>
+            <version>3.3.0-RC1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.sitemesh</groupId>
+            <artifactId>sitemesh-webfilter</artifactId>
+            <version>3.3.0-RC1</version>
+        </dependency>
+
 
 
     </dependencies>

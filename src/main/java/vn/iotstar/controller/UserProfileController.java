@@ -36,6 +36,7 @@ public class UserProfileController extends HttpServlet {
     private final IUserService userService =
             new UserServiceImpl();
 
+
     @Override
     protected void doGet(
             HttpServletRequest req,
@@ -45,15 +46,37 @@ public class UserProfileController extends HttpServlet {
         HttpSession session =
                 req.getSession(false);
 
+        if (session == null) {
+
+            resp.sendRedirect(
+                    req.getContextPath() + "/login"
+            );
+
+            return;
+        }
+
+
         User sessionUser =
                 (User) session.getAttribute(
                         Constant.SESSION_ACCOUNT
                 );
 
+
+        if (sessionUser == null) {
+
+            resp.sendRedirect(
+                    req.getContextPath() + "/login"
+            );
+
+            return;
+        }
+
+
         User user =
                 userService.findById(
                         sessionUser.getId()
                 );
+
 
         if (user == null) {
 
@@ -66,21 +89,24 @@ public class UserProfileController extends HttpServlet {
             return;
         }
 
-        // Cập nhật lại User mới nhất vào session
+
         session.setAttribute(
                 Constant.SESSION_ACCOUNT,
                 user
         );
+
 
         req.setAttribute(
                 "currentUser",
                 user
         );
 
+
         req.getRequestDispatcher(
                 "/views/user/profile.jsp"
         ).forward(req, resp);
     }
+
 
     @Override
     protected void doPost(
@@ -90,20 +116,12 @@ public class UserProfileController extends HttpServlet {
 
         req.setCharacterEncoding("UTF-8");
 
+
         HttpSession session =
                 req.getSession(false);
 
-        User sessionUser =
-                (User) session.getAttribute(
-                        Constant.SESSION_ACCOUNT
-                );
 
-        User user =
-                userService.findById(
-                        sessionUser.getId()
-                );
-
-        if (user == null) {
+        if (session == null) {
 
             resp.sendRedirect(
                     req.getContextPath() + "/login"
@@ -112,86 +130,171 @@ public class UserProfileController extends HttpServlet {
             return;
         }
 
-        String fullname =
-                req.getParameter("fullname");
 
-        String phone =
-                req.getParameter("phone");
+        User sessionUser =
+                (User) session.getAttribute(
+                        Constant.SESSION_ACCOUNT
+                );
 
-        if (fullname == null
-                || fullname.trim().isEmpty()) {
 
-            req.setAttribute(
-                    "alert",
-                    "Họ tên không được để trống."
+        if (sessionUser == null) {
+
+            resp.sendRedirect(
+                    req.getContextPath() + "/login"
             );
-
-            req.setAttribute(
-                    "currentUser",
-                    user
-            );
-
-            req.getRequestDispatcher(
-                    "/views/user/profile.jsp"
-            ).forward(req, resp);
 
             return;
         }
 
+
+        User user =
+                userService.findById(
+                        sessionUser.getId()
+                );
+
+
+        if (user == null) {
+
+            session.invalidate();
+
+            resp.sendRedirect(
+                    req.getContextPath() + "/login"
+            );
+
+            return;
+        }
+
+
+        String fullname =
+                req.getParameter("fullname");
+
+
+        String phone =
+                req.getParameter("phone");
+
+
+        /*
+         * ==========================================
+         * VALIDATE FULLNAME
+         * ==========================================
+         */
+
+        if (fullname == null
+                || fullname.trim().isEmpty()) {
+
+            showError(
+                    req,
+                    resp,
+                    user,
+                    "Họ tên không được để trống."
+            );
+
+            return;
+        }
+
+
         fullname = fullname.trim();
 
-        if (phone != null) {
-            phone = phone.trim();
+
+        if (fullname.length() < 2
+                || fullname.length() > 100) {
+
+            showError(
+                    req,
+                    resp,
+                    user,
+                    "Họ tên phải từ 2 đến 100 ký tự."
+            );
+
+            return;
         }
+
 
         /*
-         * Kiểm tra phone.
-         *
-         * Chỉ báo lỗi nếu phone thuộc về
-         * một User khác.
+         * ==========================================
+         * VALIDATE PHONE
+         * ==========================================
          */
-        if (phone != null && !phone.isEmpty()) {
 
-            User phoneUser =
-                    userService.findByPhone(phone);
+        if (phone != null) {
 
-            if (phoneUser != null
-                    && phoneUser.getId() != user.getId()) {
+            phone = phone.trim();
 
-                req.setAttribute(
-                        "alert",
-                        "Số điện thoại đã được sử dụng."
-                );
-
-                req.setAttribute(
-                        "currentUser",
-                        user
-                );
-
-                req.getRequestDispatcher(
-                        "/views/user/profile.jsp"
-                ).forward(req, resp);
-
-                return;
-            }
-
-            user.setPhone(phone);
-
-        } else {
-
-            user.setPhone(null);
         }
+
+
+        if (phone == null || phone.isEmpty()) {
+
+            showError(
+                    req,
+                    resp,
+                    user,
+                    "Số điện thoại không được để trống."
+            );
+
+            return;
+        }
+
+
+        if (!phone.matches(
+                "^(0|\\+84)[0-9]{9,10}$")) {
+
+            showError(
+                    req,
+                    resp,
+                    user,
+                    "Số điện thoại không hợp lệ."
+            );
+
+            return;
+        }
+
+
+        /*
+         * ==========================================
+         * CHECK PHONE UNIQUE
+         * ==========================================
+         */
+
+        User phoneUser =
+                userService.findByPhone(phone);
+
+
+        if (phoneUser != null
+                && phoneUser.getId() != user.getId()) {
+
+            showError(
+                    req,
+                    resp,
+                    user,
+                    "Số điện thoại đã được sử dụng."
+            );
+
+            return;
+        }
+
 
         user.setFullname(fullname);
+        user.setPhone(phone);
+
 
         /*
-         * ============================
+         * ==========================================
          * UPLOAD AVATAR
-         * ============================
+         * ==========================================
          */
+
+        String oldAvatar =
+                user.getAvatar();
+
+
+        String newAvatar =
+                null;
+
 
         Part avatarPart =
                 req.getPart("avatar");
+
 
         if (avatarPart != null
                 && avatarPart.getSize() > 0) {
@@ -199,72 +302,61 @@ public class UserProfileController extends HttpServlet {
             String submittedFileName =
                     avatarPart.getSubmittedFileName();
 
+
             if (submittedFileName == null
                     || submittedFileName.isBlank()) {
 
-                req.setAttribute(
-                        "alert",
+                showError(
+                        req,
+                        resp,
+                        user,
                         "File ảnh không hợp lệ."
                 );
 
-                req.setAttribute(
-                        "currentUser",
-                        user
-                );
-
-                req.getRequestDispatcher(
-                        "/views/user/profile.jsp"
-                ).forward(req, resp);
-
                 return;
             }
+
 
             String originalFileName =
                     Paths.get(
                             submittedFileName
                     ).getFileName().toString();
 
+
             String extension = "";
+
 
             int lastDot =
                     originalFileName.lastIndexOf('.');
 
+
             if (lastDot >= 0) {
+
                 extension =
                         originalFileName
                                 .substring(lastDot)
                                 .toLowerCase();
+
             }
 
-            /*
-             * Chỉ cho phép các định dạng ảnh.
-             */
+
             if (!extension.equals(".jpg")
                     && !extension.equals(".jpeg")
                     && !extension.equals(".png")
                     && !extension.equals(".gif")
                     && !extension.equals(".webp")) {
 
-                req.setAttribute(
-                        "alert",
+                showError(
+                        req,
+                        resp,
+                        user,
                         "Chỉ được upload file ảnh JPG, JPEG, PNG, GIF hoặc WEBP."
                 );
-
-                req.setAttribute(
-                        "currentUser",
-                        user
-                );
-
-                req.getRequestDispatcher(
-                        "/views/user/profile.jsp"
-                ).forward(req, resp);
 
                 return;
             }
 
-            /*
-             * Tạo tên file mới để tránh trùng.
-             */
+
             String newFileName =
                     "avatar_"
                             + user.getId()
@@ -272,53 +364,79 @@ public class UserProfileController extends HttpServlet {
                             + UUID.randomUUID()
                             + extension;
 
+
             Path uploadDirectory =
                     Paths.get(Constant.DIR);
+
 
             Files.createDirectories(
                     uploadDirectory
             );
+
 
             Path destination =
                     uploadDirectory.resolve(
                             newFileName
                     );
 
+
             avatarPart.write(
                     destination.toString()
             );
 
-            /*
-             * Xóa avatar cũ nếu có.
-             */
-            if (user.getAvatar() != null
-                    && !user.getAvatar().isBlank()) {
 
-                File oldFile =
-                        new File(
-                                Constant.DIR,
-                                user.getAvatar()
-                        );
+            newAvatar = newFileName;
 
-                if (oldFile.exists()) {
-                    oldFile.delete();
-                }
-            }
-
-            user.setAvatar(newFileName);
+            user.setAvatar(newAvatar);
         }
+
+
+        /*
+         * ==========================================
+         * UPDATE DATABASE
+         * ==========================================
+         */
 
         try {
 
             userService.update(user);
 
+
             /*
-             * Cập nhật User mới vào session.
+             * Xóa avatar cũ sau khi DB update
+             * thành công.
              */
+
+            if (newAvatar != null
+                    && oldAvatar != null
+                    && !oldAvatar.isBlank()
+                    && !oldAvatar.equals(newAvatar)) {
+
+                File oldFile =
+                        new File(
+                                Constant.DIR,
+                                oldAvatar
+                        );
+
+
+                if (oldFile.exists()) {
+
+                    oldFile.delete();
+
+                }
+
+            }
+
+
+            /*
+             * Update session.
+             */
+
             session.setAttribute(
                     Constant.SESSION_ACCOUNT,
                     user
             );
+
 
             resp.sendRedirect(
                     req.getContextPath()
@@ -329,20 +447,74 @@ public class UserProfileController extends HttpServlet {
 
             e.printStackTrace();
 
-            req.setAttribute(
-                    "alert",
+
+            /*
+             * Nếu DB update thất bại nhưng file mới
+             * đã được ghi thì xóa file mới.
+             */
+
+            if (newAvatar != null) {
+
+                File newFile =
+                        new File(
+                                Constant.DIR,
+                                newAvatar
+                        );
+
+
+                if (newFile.exists()) {
+
+                    newFile.delete();
+
+                }
+
+            }
+
+
+            /*
+             * Khôi phục avatar cũ trong object.
+             */
+
+            user.setAvatar(oldAvatar);
+
+
+            showError(
+                    req,
+                    resp,
+                    user,
                     "Cập nhật thông tin thất bại."
             );
-
-            req.setAttribute(
-                    "currentUser",
-                    user
-            );
-
-            req.getRequestDispatcher(
-                    "/views/user/profile.jsp"
-            ).forward(req, resp);
         }
     }
-}
 
+
+    /*
+     * ==============================================
+     * SHOW ERROR
+     * ==============================================
+     */
+
+    private void showError(
+            HttpServletRequest req,
+            HttpServletResponse resp,
+            User user,
+            String message)
+            throws ServletException, IOException {
+
+        req.setAttribute(
+                "alert",
+                message
+        );
+
+
+        req.setAttribute(
+                "currentUser",
+                user
+        );
+
+
+        req.getRequestDispatcher(
+                "/views/user/profile.jsp"
+        ).forward(req, resp);
+    }
+}
