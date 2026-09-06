@@ -111,7 +111,7 @@
 
                     <a
                             class="nav-link"
-                            href="${pageContext.request.contextPath}/product">
+                            href="${pageContext.request.contextPath}/user/product">
 
                         <i class="bi bi-bag me-1"></i>
 
