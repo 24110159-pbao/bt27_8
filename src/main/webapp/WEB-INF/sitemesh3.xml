@@ -2,12 +2,32 @@
 
 <sitemesh>
 
+    <!-- =========================================================
+         USER DECORATOR
+         ========================================================= -->
     <mapping
             path="/user/*"
             decorator="main.jsp"/>
 
+
+    <!-- =========================================================
+         ADMIN DECORATOR
+         ========================================================= -->
+    <mapping
+            path="/admin/*"
+            decorator="admin.jsp"/>
+
+
+    <!-- =========================================================
+         STATIC RESOURCES - KHÔNG DECORATE
+         ========================================================= -->
+
     <mapping
             path="/css/*"
+            exclude="true"/>
+
+    <mapping
+            path="/js/*"
             exclude="true"/>
 
     <mapping
@@ -16,10 +36,6 @@
 
     <mapping
             path="/images/*"
-            exclude="true"/>
-
-    <mapping
-            path="/js/*"
             exclude="true"/>
 
     <mapping

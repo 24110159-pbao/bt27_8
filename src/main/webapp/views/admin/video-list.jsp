@@ -11,553 +11,323 @@
             (String) request.getAttribute("keyword");
 %>
 
-<!DOCTYPE html>
-<html lang="vi">
 
-<head>
+<title>Quản lý video - Shopping MVC</title>
 
-    <meta charset="UTF-8">
 
-    <title>Quản lý video - Shopping MVC</title>
+<section class="content">
 
-    <link rel="stylesheet"
-          href="${pageContext.request.contextPath}/css/style.css">
 
-</head>
+    <!-- =====================================================
+         PAGE HEADER
+         ===================================================== -->
 
-<body>
+    <div class="page-title">
 
-<div class="admin-layout">
+        <div>
 
-    <!-- SIDEBAR -->
+            <h1>
+                Video
+            </h1>
 
-    <aside class="sidebar">
+            <p>
+                Quản lý các video trong hệ thống
+            </p>
 
-        <div class="sidebar-logo">
+        </div>
 
-            🛒
 
-            <span>
-                Shopping MVC
+        <a
+                href="${pageContext.request.contextPath}/admin/video/add"
+                class="btn btn-primary">
+
+            <i class="bi bi-plus-lg me-1"></i>
+
+            Thêm video
+
+        </a>
+
+    </div>
+
+
+    <!-- =====================================================
+         SEARCH
+         ===================================================== -->
+
+    <div class="card">
+
+        <div class="card-body">
+
+            <form
+                    method="get"
+                    action="${pageContext.request.contextPath}/admin/videos"
+                    class="row g-2 needs-validation"
+                    novalidate>
+
+
+                <div class="col-12 col-md-6 col-lg-5">
+
+                    <label
+                            for="keyword"
+                            class="form-label">
+
+                        Tìm kiếm video
+
+                    </label>
+
+                    <input
+                            type="text"
+                            id="keyword"
+                            name="keyword"
+                            class="form-control"
+                            placeholder="Tìm kiếm theo tiêu đề video..."
+                            maxlength="100"
+                            value="<%= keyword != null ? keyword : "" %>">
+
+                    <div class="invalid-feedback">
+
+                        Từ khóa không được vượt quá 100 ký tự.
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-12 col-md-auto d-flex align-items-end gap-2">
+
+                    <button
+                            type="submit"
+                            class="btn btn-primary">
+
+                        <i class="bi bi-search me-1"></i>
+
+                        Tìm kiếm
+
+                    </button>
+
+
+                    <a
+                            href="${pageContext.request.contextPath}/admin/videos"
+                            class="btn btn-secondary">
+
+                        <i class="bi bi-arrow-clockwise me-1"></i>
+
+                        Làm mới
+
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         VIDEO CARD
+         ===================================================== -->
+
+    <div class="card">
+
+
+        <!-- HEADER -->
+
+        <div class="card-header">
+
+            <div>
+
+                <h3>
+
+                    <i class="bi bi-camera-video-fill text-primary me-2"></i>
+
+                    Danh sách video
+
+                </h3>
+
+                <span>
+                    Quản lý thông tin video
+                </span>
+
+            </div>
+
+
+            <span class="badge">
+
+                Tổng số:
+
+                <%= listVideo != null
+                        ? listVideo.size()
+                        : 0 %>
+
             </span>
 
         </div>
 
-        <div class="sidebar-menu">
 
-            <div class="menu-title">
-                QUẢN LÝ
-            </div>
+        <!-- BODY -->
 
-            <a href="${pageContext.request.contextPath}/admin/home"
-               class="menu-item">
+        <div class="card-body">
 
-                📊
+            <div class="table-wrapper">
 
-                <span>
-                    Trang chủ
-                </span>
+                <table class="table">
 
-            </a>
 
+                    <thead>
 
-            <a href="${pageContext.request.contextPath}/admin/categories"
-               class="menu-item">
+                    <tr>
 
-                📁
+                        <th style="width:70px;">
+                            ID
+                        </th>
 
-                <span>
-                    Danh mục
-                </span>
+                        <th style="width:130px;">
+                            Poster
+                        </th>
 
-            </a>
+                        <th>
+                            Tiêu đề
+                        </th>
 
-            <!-- Sản phẩm -->
-            <a href="${pageContext.request.contextPath}/admin/products"
-               class="menu-item">
+                        <th>
+                            Danh mục
+                        </th>
 
-                🛍
+                        <th>
+                            Lượt xem
+                        </th>
 
-                <span>
-                    Sản phẩm
-                </span>
+                        <th>
+                            Trạng thái
+                        </th>
 
-            </a>
+                        <th style="width:190px;">
+                            Thao tác
+                        </th>
 
-            <a href="${pageContext.request.contextPath}/admin/videos"
-               class="menu-item active">
+                    </tr>
 
-                🎬
+                    </thead>
 
-                <span>
-                    Video
-                </span>
 
-            </a>
+                    <tbody>
 
 
-            <div class="menu-title">
-                HỆ THỐNG
-            </div>
+                    <%
 
+                        if (listVideo != null
+                                && !listVideo.isEmpty()) {
 
-            <a href="${pageContext.request.contextPath}/logout"
-               class="menu-item">
+                            for (Video video : listVideo) {
 
-                🚪
+                    %>
 
-                <span>
-                    Đăng xuất
-                </span>
 
-            </a>
+                    <tr>
 
-        </div>
 
-    </aside>
+                        <!-- ID -->
 
+                        <td>
 
-    <!-- MAIN -->
+                            <span class="id-badge">
 
-    <main class="main-area">
+                                <%= video.getVideoId() %>
 
+                            </span>
 
-        <!-- TOPBAR -->
+                        </td>
 
-        <header class="topbar">
 
-            <div class="topbar-title">
-                Quản lý video
-            </div>
+                        <!-- POSTER -->
 
+                        <td>
 
-            <div class="user-info">
+                            <div class="category-icon">
 
-                <div class="avatar">
-                    A
-                </div>
+                                <%
 
-                <span>
-                    Administrator
-                </span>
+                                    String poster =
+                                            video.getPoster();
 
-            </div>
+                                    if (poster != null
+                                            && !poster.trim().isEmpty()) {
 
-        </header>
+                                %>
 
+                                <img
+                                        src="${pageContext.request.contextPath}/image?fname=<%= poster %>"
+                                        class="category-image"
+                                        alt="Poster video">
 
-        <!-- CONTENT -->
+                                <%
 
-        <section class="content">
+                                } else {
 
+                                %>
 
-            <!-- PAGE TITLE -->
+                                <span class="default-icon">
 
-            <div class="page-title">
+                                    <i class="bi bi-camera-video-fill text-secondary"></i>
 
-                <div>
+                                </span>
 
-                    <h1>
-                        Video
-                    </h1>
+                                <%
 
-                    <p>
-                        Quản lý các video trong hệ thống
-                    </p>
+                                    }
 
-                </div>
+                                %>
 
+                            </div>
 
-                <a
-                        href="${pageContext.request.contextPath}/admin/video/add"
-                        class="btn btn-primary">
+                        </td>
 
-                    + Thêm video
 
-                </a>
+                        <!-- TITLE -->
 
-            </div>
+                        <td>
 
+                            <div class="category-name">
 
-            <!-- SEARCH -->
+                                <%= video.getTitle() != null
+                                        ? video.getTitle()
+                                        : "" %>
 
-            <div class="card">
+                            </div>
 
-                <div class="card-body">
+                        </td>
 
-                    <form
-                            method="get"
-                            action="${pageContext.request.contextPath}/admin/videos"
-                            style="display:flex; gap:10px;">
 
-                        <input
-                                type="text"
-                                name="keyword"
-                                class="form-control"
-                                placeholder="Tìm kiếm theo tiêu đề video..."
-                                value="<%= keyword != null
-                                        ? keyword
-                                        : "" %>">
+                        <!-- CATEGORY -->
 
-                        <button
-                                type="submit"
-                                class="btn btn-primary">
-
-                            🔍 Tìm kiếm
-
-                        </button>
-
-
-                        <a
-                                href="${pageContext.request.contextPath}/admin/videos"
-                                class="btn btn-secondary">
-
-                            Làm mới
-
-                        </a>
-
-                    </form>
-
-                </div>
-
-            </div>
-
-
-            <!-- VIDEO CARD -->
-
-            <div class="card">
-
-
-                <!-- HEADER -->
-
-                <div class="card-header">
-
-                    <div>
-
-                        <h3>
-                            Danh sách video
-                        </h3>
-
-                        <span>
-                            Quản lý thông tin video
-                        </span>
-
-                    </div>
-
-
-                    <span class="badge">
-
-                        Tổng số:
-                        <%= listVideo != null
-                                ? listVideo.size()
-                                : 0 %>
-
-                    </span>
-
-                </div>
-
-
-                <!-- BODY -->
-
-                <div class="card-body">
-
-                    <div class="table-wrapper">
-
-                        <table class="table">
-
-                            <thead>
-
-                            <tr>
-
-                                <th>
-                                    ID
-                                </th>
-
-                                <th style="width:130px;">
-                                    Poster
-                                </th>
-
-                                <th>
-                                    Tiêu đề
-                                </th>
-
-                                <th>
-                                    Danh mục
-                                </th>
-
-                                <th>
-                                    Lượt xem
-                                </th>
-
-                                <th>
-                                    Trạng thái
-                                </th>
-
-                                <th style="width:190px;">
-                                    Thao tác
-                                </th>
-
-                            </tr>
-
-                            </thead>
-
-
-                            <tbody>
-
+                        <td>
 
                             <%
 
-                                if (listVideo != null
-                                        && !listVideo.isEmpty()) {
-
-                                    for (Video video :
-                                            listVideo) {
+                                if (video.getCategory() != null) {
 
                             %>
 
+                            <span class="badge">
 
-                            <tr>
+                                <%= video.getCategory()
+                                        .getCateName() %>
 
-
-                                <!-- ID -->
-
-                                <td>
-
-                                    <span class="id-badge">
-
-                                        <%= video.getVideoId() %>
-
-                                    </span>
-
-                                </td>
-
-
-                                <!-- POSTER -->
-
-                                <td>
-
-                                    <div class="category-icon">
-
-                                        <%
-
-                                            String poster =
-                                                    video.getPoster();
-
-                                            if (poster != null
-                                                    && !poster.trim().isEmpty()) {
-
-                                        %>
-
-                                        <img
-                                                src="${pageContext.request.contextPath}/image?fname=<%= poster %>"
-                                                class="category-image"
-                                                alt="Poster">
-
-
-                                        <%
-
-                                            } else {
-
-                                        %>
-
-                                        <span class="default-icon">
-                                            🎬
-                                        </span>
-
-                                        <%
-
-                                            }
-
-                                        %>
-
-                                    </div>
-
-                                </td>
-
-
-                                <!-- TITLE -->
-
-                                <td>
-
-                                    <div class="category-name">
-
-                                        <%= video.getTitle() != null
-                                                ? video.getTitle()
-                                                : "" %>
-
-                                    </div>
-
-                                </td>
-
-
-                                <!-- CATEGORY -->
-
-                                <td>
-
-                                    <%
-
-                                        if (video.getCategory() != null) {
-
-                                    %>
-
-                                    <span class="badge">
-
-                                        <%= video.getCategory()
-                                                .getCateName() %>
-
-                                    </span>
-
-                                    <%
-
-                                        } else {
-
-                                    %>
-
-                                    <span class="no-image">
-                                        Chưa có danh mục
-                                    </span>
-
-                                    <%
-
-                                        }
-
-                                    %>
-
-                                </td>
-
-
-                                <!-- VIEWS -->
-
-                                <td>
-
-                                    👁
-
-                                    <%= video.getViews() %>
-
-                                </td>
-
-
-                                <!-- ACTIVE -->
-
-                                <td>
-
-                                    <%
-
-                                        if (video.isActive()) {
-
-                                    %>
-
-                                    <span
-                                            class="badge"
-                                            style="background:#dcfce7;color:#166534;">
-
-                                        Hoạt động
-
-                                    </span>
-
-                                    <%
-
-                                        } else {
-
-                                    %>
-
-                                    <span
-                                            class="badge"
-                                            style="background:#fee2e2;color:#991b1b;">
-
-                                        Không hoạt động
-
-                                    </span>
-
-                                    <%
-
-                                        }
-
-                                    %>
-
-                                </td>
-
-
-                                <!-- ACTION -->
-
-                                <td>
-
-                                    <div class="actions">
-
-
-                                        <a
-                                                href="${pageContext.request.contextPath}/admin/video/edit?id=<%= video.getVideoId() %>"
-                                                class="btn btn-warning">
-
-                                            ✏ Sửa
-
-                                        </a>
-
-
-                                        <a
-                                                href="${pageContext.request.contextPath}/admin/video/delete?id=<%= video.getVideoId() %>"
-                                                class="btn btn-danger"
-
-                                                onclick="return confirm('Bạn có chắc muốn xóa video này?');">
-
-                                            🗑 Xóa
-
-                                        </a>
-
-                                    </div>
-
-                                </td>
-
-
-                            </tr>
-
+                            </span>
 
                             <%
-
-                                    }
 
                                 } else {
 
                             %>
 
+                            <span class="text-muted">
 
-                            <!-- EMPTY -->
+                                Chưa có danh mục
 
-                            <tr>
-
-                                <td
-                                        colspan="7"
-                                        class="empty-state">
-
-
-                                    <div class="empty-icon">
-                                        🎬
-                                    </div>
-
-
-                                    <h3>
-                                        Chưa có video
-                                    </h3>
-
-
-                                    <p>
-                                        Hãy thêm video đầu tiên cho hệ thống.
-                                    </p>
-
-
-                                    <a
-                                            href="${pageContext.request.contextPath}/admin/video/add"
-                                            class="btn btn-primary">
-
-                                        + Thêm video
-
-                                    </a>
-
-
-                                </td>
-
-                            </tr>
-
+                            </span>
 
                             <%
 
@@ -565,24 +335,174 @@
 
                             %>
 
+                        </td>
 
-                            </tbody>
 
-                        </table>
+                        <!-- VIEWS -->
 
-                    </div>
+                        <td>
 
-                </div>
+                            <i class="bi bi-eye me-1"></i>
+
+                            <%= video.getViews() %>
+
+                        </td>
+
+
+                        <!-- STATUS -->
+
+                        <td>
+
+                            <%
+
+                                if (video.isActive()) {
+
+                            %>
+
+                            <span
+                                    class="badge"
+                                    style="
+                                        background:#dcfce7;
+                                        color:#166534;
+                                    ">
+
+                                <i class="bi bi-check-circle me-1"></i>
+
+                                Hoạt động
+
+                            </span>
+
+                            <%
+
+                                } else {
+
+                            %>
+
+                            <span
+                                    class="badge"
+                                    style="
+                                        background:#fee2e2;
+                                        color:#991b1b;
+                                    ">
+
+                                <i class="bi bi-x-circle me-1"></i>
+
+                                Không hoạt động
+
+                            </span>
+
+                            <%
+
+                                }
+
+                            %>
+
+                        </td>
+
+
+                        <!-- ACTION -->
+
+                        <td>
+
+                            <div class="actions">
+
+
+                                <a
+                                        href="${pageContext.request.contextPath}/admin/video/edit?id=<%= video.getVideoId() %>"
+                                        class="btn btn-sm btn-warning">
+
+                                    <i class="bi bi-pencil-square me-1"></i>
+
+                                    Sửa
+
+                                </a>
+
+
+                                <a
+                                        href="${pageContext.request.contextPath}/admin/video/delete?id=<%= video.getVideoId() %>"
+                                        class="btn btn-sm btn-danger"
+
+                                        onclick="
+                                            return confirm(
+                                                'Bạn có chắc muốn xóa video này?'
+                                            );
+                                        ">
+
+                                    <i class="bi bi-trash me-1"></i>
+
+                                    Xóa
+
+                                </a>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+
+                    <%
+
+                            }
+
+                        } else {
+
+                    %>
+
+
+                    <!-- EMPTY -->
+
+                    <tr>
+
+                        <td
+                                colspan="7"
+                                class="empty-state">
+
+                            <div class="empty-icon">
+
+                                <i class="bi bi-camera-video-off text-secondary"></i>
+
+                            </div>
+
+                            <h3>
+                                Chưa có video
+                            </h3>
+
+                            <p>
+                                Hãy thêm video đầu tiên cho hệ thống.
+                            </p>
+
+                            <a
+                                    href="${pageContext.request.contextPath}/admin/video/add"
+                                    class="btn btn-primary">
+
+                                <i class="bi bi-plus-lg me-1"></i>
+
+                                Thêm video
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+
+                    <%
+
+                        }
+
+                    %>
+
+
+                    </tbody>
+
+                </table>
 
             </div>
 
+        </div>
 
-        </section>
+    </div>
 
-    </main>
 
-</div>
-
-</body>
-
-</html>
+</section>

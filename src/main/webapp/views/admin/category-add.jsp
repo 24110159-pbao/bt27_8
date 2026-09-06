@@ -1,323 +1,471 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
-<!DOCTYPE html>
-<html lang="vi">
+<title>Thêm danh mục - Shopping MVC</title>
 
-<head>
-    <meta charset="UTF-8">
+<section class="content">
 
-    <title>Thêm danh mục - Shopping MVC</title>
+    <!-- ================= PAGE TITLE ================= -->
 
-    <link rel="stylesheet"
-          href="${pageContext.request.contextPath}/css/style.css">
-</head>
+    <div class="page-title">
 
-<body>
-
-<div class="admin-layout">
-
-    <!-- ================= SIDEBAR ================= -->
-
-    <aside class="sidebar">
-
-        <div class="sidebar-logo">
-
-            🛒
-
-            <span>
-                Shopping MVC
-            </span>
-
-        </div>
-
-        <div class="sidebar-menu">
-
-            <div class="menu-title">
-                QUẢN LÝ
-            </div>
-
-            <!-- Trang chủ -->
-
-            <a href="${pageContext.request.contextPath}/admin/home"
-               class="menu-item">
-
-                📊
-
-                <span>
-                    Trang chủ
-                </span>
-
-            </a>
-
-            <!-- Danh mục -->
-
-            <a href="${pageContext.request.contextPath}/admin/categories"
-               class="menu-item active">
-
-                📁
-
-                <span>
-                    Danh mục
-                </span>
-
-            </a>
-
-            <!-- Video -->
-
-            <a href="${pageContext.request.contextPath}/admin/videos"
-               class="menu-item">
-
-                🎬
-
-                <span>
-                    Video
-                </span>
-
-            </a>
-
-            <div class="menu-title">
-                HỆ THỐNG
-            </div>
-
-            <!-- Logout -->
-
-            <a href="${pageContext.request.contextPath}/logout"
-               class="menu-item">
-
-                🚪
-
-                <span>
-                    Đăng xuất
-                </span>
-
-            </a>
-
-        </div>
-
-    </aside>
-
-    <!-- ================= MAIN ================= -->
-
-    <main class="main-area">
-
-        <!-- TOPBAR -->
-
-        <header class="topbar">
-
-            <div class="topbar-title">
+        <div>
+            <h1>
                 Thêm danh mục
+            </h1>
+
+            <p>
+                Tạo một danh mục mới cho hệ thống
+            </p>
+        </div>
+
+        <a
+                href="${pageContext.request.contextPath}/admin/categories"
+                class="btn btn-secondary">
+
+            ← Quay lại
+
+        </a>
+
+    </div>
+
+
+    <!-- ================= ERROR ================= -->
+
+    <% if (request.getAttribute("error") != null) { %>
+
+        <div class="alert alert-danger alert-dismissible fade show"
+             role="alert">
+
+            <strong>⚠ Có lỗi xảy ra!</strong>
+
+            <div>
+                <%= request.getAttribute("error") %>
             </div>
 
-            <div class="user-info">
+            <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Close">
+            </button>
 
-                <div class="avatar">
-                    A
-                </div>
+        </div>
+
+    <% } %>
+
+
+    <!-- ================= FORM CARD ================= -->
+
+    <div class="card form-card">
+
+        <!-- HEADER -->
+
+        <div class="card-header">
+
+            <div>
+
+                <h3>
+                    <i class="bi bi-folder-plus text-primary me-2"></i>
+                    Thông tin danh mục
+                </h3>
 
                 <span>
-                    Administrator
+                    Nhập thông tin và chọn icon cho danh mục
                 </span>
 
             </div>
 
-        </header>
+        </div>
 
-        <!-- CONTENT -->
 
-        <section class="content">
+        <!-- BODY -->
 
-            <!-- PAGE TITLE -->
+        <div class="card-body">
 
-            <div class="page-title">
+            <form
+                    id="categoryForm"
+                    method="post"
+                    action="${pageContext.request.contextPath}/admin/category/insert"
+                    enctype="multipart/form-data"
+                    novalidate>
 
-                <div>
 
-                    <h1>
-                        Thêm danh mục
-                    </h1>
+                <!-- ================= NAME ================= -->
 
-                    <p>
-                        Tạo một danh mục mới cho hệ thống
-                    </p>
+                <div class="form-group mb-4">
 
-                </div>
+                    <label
+                            for="cateName"
+                            class="form-label fw-semibold">
 
-                <a href="${pageContext.request.contextPath}/admin/categories"
-                   class="btn btn-secondary">
+                        Tên danh mục
+                        <span class="text-danger">*</span>
 
-                    ← Quay lại
+                    </label>
 
-                </a>
+                    <input
+                            type="text"
+                            id="cateName"
+                            name="cateName"
+                            class="form-control"
+                            placeholder="Ví dụ: Điện thoại"
+                            minlength="2"
+                            maxlength="100"
+                            required>
 
-            </div>
-
-            <!-- ERROR -->
-
-            <% if (request.getAttribute("error") != null) { %>
-
-                <div class="alert alert-danger">
-
-                    <%= request.getAttribute("error") %>
-
-                </div>
-
-            <% } %>
-
-            <!-- FORM CARD -->
-
-            <div class="card form-card">
-
-                <!-- HEADER -->
-
-                <div class="card-header">
-
-                    <div>
-
-                        <h3>
-                            Thông tin danh mục
-                        </h3>
-
-                        <span>
-                            Nhập thông tin và chọn icon cho danh mục
-                        </span>
-
+                    <div class="invalid-feedback">
+                        Vui lòng nhập tên danh mục từ 2 đến 100 ký tự.
                     </div>
 
+                    <small class="form-hint text-muted">
+                        Tên danh mục phải có ít nhất 2 ký tự.
+                    </small>
+
                 </div>
 
-                <!-- BODY -->
 
-                <div class="card-body">
+                <!-- ================= IMAGE ================= -->
 
-                    <form
-                        method="post"
-                        action="${pageContext.request.contextPath}/admin/category/insert"
-                        enctype="multipart/form-data">
+                <div class="form-group mb-4">
 
-                        <!-- ================= NAME ================= -->
+                    <label
+                            for="icon"
+                            class="form-label fw-semibold">
 
-                        <div class="form-group">
+                        Icon danh mục
 
-                            <label for="cateName">
-                                Tên danh mục
-                            </label>
+                    </label>
 
-                            <input
-                                type="text"
-                                id="cateName"
-                                name="cateName"
-                                class="form-control"
-                                placeholder="Ví dụ: Điện thoại"
-                                required>
+                    <input
+                            type="file"
+                            id="icon"
+                            name="icon"
+                            class="form-control file-input"
+                            accept="image/jpeg,image/png,image/gif,image/webp">
 
-                        </div>
+                    <small class="form-hint text-muted">
 
-                        <!-- ================= IMAGE ================= -->
+                        Chọn ảnh JPG, JPEG, PNG, GIF hoặc WEBP.
+                        Dung lượng tối đa 5MB.
 
-                        <div class="form-group">
+                    </small>
 
-                            <label for="icon">
-                                Icon danh mục
-                            </label>
 
-                            <input
-                                type="file"
-                                id="icon"
-                                name="icon"
-                                class="form-control file-input"
-                                accept="image/*"
-                                onchange="previewImage(event)">
+                    <!-- ================= PREVIEW ================= -->
 
-                            <small class="form-hint">
+                    <div
+                            id="preview-container"
+                            class="mt-3"
+                            style="display:none;">
 
-                                Chọn ảnh từ máy tính.
-                                Định dạng hỗ trợ: JPG, JPEG, PNG, GIF.
+                        <div class="card border">
 
-                            </small>
+                            <div class="card-body">
 
-                            <!-- PREVIEW -->
+                                <div class="d-flex justify-content-between align-items-center mb-3">
 
-                            <div
-                                id="preview-container"
-                                style="display:none; margin-top:15px;">
+                                    <strong>
+                                        <i class="bi bi-image me-1"></i>
+                                        Xem trước icon
+                                    </strong>
 
-                                <p class="preview-label">
-                                    Xem trước:
-                                </p>
+                                    <button
+                                            type="button"
+                                            id="removePreview"
+                                            class="btn btn-sm btn-outline-danger">
 
-                                <img
-                                    id="preview"
-                                    class="preview-image"
-                                    alt="Ảnh xem trước">
+                                        ✕ Xóa ảnh
+
+                                    </button>
+
+                                </div>
+
+                                <div class="text-center">
+
+                                    <img
+                                            id="preview"
+                                            class="preview-image img-thumbnail"
+                                            alt="Ảnh xem trước">
+
+                                </div>
 
                             </div>
 
                         </div>
 
-                        <!-- ================= BUTTON ================= -->
-
-                        <div class="form-actions">
-
-                            <button
-                                type="submit"
-                                class="btn btn-primary">
-
-                                ✓ Thêm danh mục
-
-                            </button>
-
-                            <a
-                                href="${pageContext.request.contextPath}/admin/categories"
-                                class="btn btn-secondary">
-
-                                Hủy
-
-                            </a>
-
-                        </div>
-
-                    </form>
+                    </div>
 
                 </div>
 
-            </div>
 
-        </section>
+                <!-- ================= BUTTON ================= -->
 
-    </main>
+                <div class="form-actions d-flex gap-2">
 
-</div>
+                    <button
+                            type="submit"
+                            class="btn btn-primary">
+
+                        <i class="bi bi-check-circle me-1"></i>
+
+                        Thêm danh mục
+
+                    </button>
+
+
+                    <a
+                            href="${pageContext.request.contextPath}/admin/categories"
+                            class="btn btn-secondary">
+
+                        <i class="bi bi-x-circle me-1"></i>
+
+                        Hủy
+
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</section>
+
 
 <!-- ================= JAVASCRIPT ================= -->
 
 <script>
 
-    function previewImage(event) {
+document.addEventListener("DOMContentLoaded", function () {
 
-        const file = event.target.files[0];
+    const form =
+        document.getElementById("categoryForm");
 
-        const preview = document.getElementById("preview");
+    const cateName =
+        document.getElementById("cateName");
 
-        const container = document.getElementById("preview-container");
+    const icon =
+        document.getElementById("icon");
 
-        if (file) {
+    const preview =
+        document.getElementById("preview");
 
-            preview.src = URL.createObjectURL(file);
+    const previewContainer =
+        document.getElementById("preview-container");
 
-            container.style.display = "block";
+    const removePreview =
+        document.getElementById("removePreview");
+
+
+    /*
+     * ==========================================
+     * VALIDATION TÊN DANH MỤC
+     * ==========================================
+     */
+
+    cateName.addEventListener("input", function () {
+
+        const value =
+            cateName.value.trim();
+
+        if (value.length >= 2 &&
+            value.length <= 100) {
+
+            cateName.classList.remove("is-invalid");
+            cateName.classList.add("is-valid");
 
         } else {
 
-            preview.src = "";
-
-            container.style.display = "none";
+            cateName.classList.remove("is-valid");
+            cateName.classList.add("is-invalid");
 
         }
 
+    });
+
+
+    /*
+     * ==========================================
+     * PREVIEW IMAGE
+     * ==========================================
+     */
+
+    icon.addEventListener("change", function () {
+
+        const file =
+            icon.files[0];
+
+        if (!file) {
+
+            hidePreview();
+
+            return;
+
+        }
+
+
+        /*
+         * Kiểm tra loại file
+         */
+
+        const allowedTypes = [
+            "image/jpeg",
+            "image/png",
+            "image/gif",
+            "image/webp"
+        ];
+
+
+        if (!allowedTypes.includes(file.type)) {
+
+            alert(
+                "Vui lòng chọn file ảnh JPG, PNG, GIF hoặc WEBP."
+            );
+
+            icon.value = "";
+
+            hidePreview();
+
+            return;
+
+        }
+
+
+        /*
+         * Kiểm tra dung lượng
+         * 5MB
+         */
+
+        const maxSize =
+            5 * 1024 * 1024;
+
+
+        if (file.size > maxSize) {
+
+            alert(
+                "Dung lượng ảnh không được vượt quá 5MB."
+            );
+
+            icon.value = "";
+
+            hidePreview();
+
+            return;
+
+        }
+
+
+        /*
+         * Hiển thị preview
+         */
+
+        const reader =
+            new FileReader();
+
+
+        reader.onload = function (event) {
+
+            preview.src =
+                event.target.result;
+
+            previewContainer.style.display =
+                "block";
+
+        };
+
+
+        reader.readAsDataURL(file);
+
+    });
+
+
+    /*
+     * ==========================================
+     * REMOVE IMAGE
+     * ==========================================
+     */
+
+    removePreview.addEventListener(
+        "click",
+        function () {
+
+            icon.value = "";
+
+            hidePreview();
+
+        }
+    );
+
+
+    function hidePreview() {
+
+        preview.src = "";
+
+        previewContainer.style.display =
+            "none";
+
     }
 
+
+    /*
+     * ==========================================
+     * FORM VALIDATION
+     * ==========================================
+     */
+
+    form.addEventListener(
+        "submit",
+        function (event) {
+
+            const value =
+                cateName.value.trim();
+
+
+            /*
+             * Không nhập tên
+             */
+
+            if (value.length < 2 ||
+                value.length > 100) {
+
+                event.preventDefault();
+
+                cateName.classList.add(
+                    "is-invalid"
+                );
+
+                cateName.focus();
+
+                return;
+
+            }
+
+
+            /*
+             * Không cho khoảng trắng đầu/cuối
+             */
+
+            cateName.value =
+                value;
+
+
+            /*
+             * Xóa trạng thái invalid
+             */
+
+            cateName.classList.remove(
+                "is-invalid"
+            );
+
+            cateName.classList.add(
+                "is-valid"
+            );
+
+        }
+    );
+
+});
+
 </script>
-
-</body>
-
-</html>
